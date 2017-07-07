@@ -2,6 +2,7 @@ init:
 	pip install -r requirements.txt
 
 flake8:
+	pip install flake8
 	flake8 livescore
 
 publish:
