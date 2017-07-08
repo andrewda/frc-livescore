@@ -4,6 +4,7 @@ import pytesseract
 import re
 import imutils
 import pkg_resources
+from math import isnan
 from PIL import Image
 
 
@@ -111,15 +112,15 @@ class Livescore:
                                                 config='--psm 7').strip()
         m = re.search('([a-zA-z]+) ([1-9]+)( of ...?)?', long_match_string)
         if m is not None:
-            match_string = m.group(1) + ' ' + m.group(2)
+            match = m.group(1) + ' ' + m.group(2)
         else:
-            match_string = ''
+            match = False
 
-        time_remaining = self.getTimeArea(scoreboard)
+        time_cropped = self.getTimeArea(scoreboard)
         red_cropped = self.getRedScoreArea(scoreboard)
         blue_cropped = self.getBlueScoreArea(scoreboard)
 
-        time_remaining = cv2.inRange(time_remaining,
+        time_cropped = cv2.inRange(time_cropped,
                                      self.BLACK_LOW,
                                      self.BLACK_HIGH)
         blue_cropped = cv2.inRange(blue_cropped,
@@ -129,23 +130,25 @@ class Livescore:
                                   self.WHITE_LOW,
                                   self.WHITE_HIGH)
 
-        time_remaining_string = pytesseract.image_to_string(
-                                            Image.fromarray(time_remaining),
-                                            config='--psm 8 digits').strip()
-        blue_score_string = pytesseract.image_to_string(
+        config = '--psm 8 -c tessedit_char_whitelist=1234567890 digits'
+
+        time_remaining = pytesseract.image_to_string(
+                                            Image.fromarray(time_cropped),
+                                            config=config).strip()
+        blue_score = pytesseract.image_to_string(
                                             Image.fromarray(blue_cropped),
-                                            config='--psm 8 digits').strip()
-        red_score_string = pytesseract.image_to_string(
+                                            config=config).strip()
+        red_score = pytesseract.image_to_string(
                                             Image.fromarray(red_cropped),
-                                            config='--psm 8 digits').strip()
+                                            config=config).strip()
 
         return {
-            'match': match_string,
-            'time': int(time_remaining_string),
+            'match': match,
+            'time': int(time_remaining) if time_remaining.isdigit() else False,
             'red': {
-                'score': int(red_score_string)
+                'score': int(red_score) if red_score.isdigit() else False
             },
             'blue': {
-                'score': int(blue_score_string)
+                'score': int(blue_score) if blue_score.isdigit() else False
             }
         }
