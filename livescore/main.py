@@ -4,7 +4,6 @@ import pytesseract
 import re
 import imutils
 import pkg_resources
-from math import isnan
 from PIL import Image
 
 
@@ -121,8 +120,8 @@ class Livescore:
         blue_cropped = self.getBlueScoreArea(scoreboard)
 
         time_cropped = cv2.inRange(time_cropped,
-                                     self.BLACK_LOW,
-                                     self.BLACK_HIGH)
+                                   self.BLACK_LOW,
+                                   self.BLACK_HIGH)
         blue_cropped = cv2.inRange(blue_cropped,
                                    self.WHITE_LOW,
                                    self.WHITE_HIGH)
