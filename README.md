@@ -22,6 +22,13 @@ and OpenCV 3 (instructions for
 [Linux](http://docs.opencv.org/3.2.0/d7/d9f/tutorial_linux_install.html))
 installed in order for `frc-livescore` to work.
 
+### Install Through pip
+```bash
+ $ pip install numpy
+ $ pip install opencv-python
+ $ sudo pip install pytesseract
+```
+
 ## Usage
 
 *Check out the `examples` directory for full examples on the usage of
