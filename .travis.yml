@@ -16,5 +16,5 @@ before_script:
 script:
   - make flake8
   - pip install . --upgrade
-  - cd examples
-  - python simple.py
+  - cd tests
+  - python test.py
