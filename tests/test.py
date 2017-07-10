@@ -31,4 +31,4 @@ for f in os.listdir('./images'):
         print 'Received: {}'.format([data.red.score,
                                      data.blue.score,
                                      data.time])
-        sys.exit()
+        sys.exit(code=1)
