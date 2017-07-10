@@ -3,7 +3,7 @@ init:
 
 flake8:
 	pip install flake8
-	flake8 livescore
+	flake8 livescore --statistics --show-source
 
 publish:
 	pip install 'twine>=1.5.0'

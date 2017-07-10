@@ -1,5 +1,20 @@
-sudo: false
 language: python
-python: "2.7"
-install: "make"
-script: "make flake8"
+python: 2.7
+cache:
+  pip: true
+  directories:
+    - opencv/
+install:
+  - sudo apt-get install python-dev python-numpy tesseract-ocr
+  - make
+before_script:
+  - bash build_opencv.sh
+  - cd opencv/build/
+  - sudo make install
+  - cd ../../
+  - export PYTHONPATH=$PYTHONPATH:/usr/lib/python2.7/site-packages/
+script:
+  # - make flake8
+  - pip install . --upgrade
+  - cd tests
+  - python test.py
