@@ -43,14 +43,16 @@ image = cv2.imread('./examples/scenes/scene1.png')
 # Get score data
 data = frc.read(image)
 
-print('Red {0} : {2} : {1} Blue'.format(data['red']['score'],
-                                        data['blue']['score'],
-                                        data['time']))
+print('Red {0} : {2} : {1} Blue'.format(data.red.score,
+                                        data.blue.score,
+                                        data.time))
 ```
 
 ## API
 
-### Livescore(options)
+### Methods
+
+#### Livescore(options)
 
 - `options` - [optional] a dict of options
     - `scoreboard` - A template image to match for the whole scoreboard
@@ -60,53 +62,77 @@ print('Red {0} : {2} : {1} Blue'.format(data['red']['score'],
 
 Creates and returns a new Livescore instance with specified options.
 
-### .read(img)
+#### .read(img)
 
 - `img` - The image to read from
 
-Reads an image and returns the score data. Values that could not be determined
-from the input image will be `False`.
+Reads an image and returns an [OngoingMatchDetails](#ongoingmatchdetails) class
+containing the score data. Values that could not be determined from the input
+image will be `False`.
 
-### .getScoreboard(img)
+#### .getScoreboard(img)
 
 - `img` - The image to read from
 
 Returns the same image, cropped around the scoreboard.
 
-### .getTopBar(img)
+#### .getTopBar(img)
 
 - `img` - The image to read from
 
 Returns the same image, cropped around the top bar.
 
-### .getTimeArea(img)
+#### .getTimeArea(img)
 
 - `img` - The image to read from
 
 Returns the same image, cropped around the time remaining area.
 
-### .getScoreArea(img)
+#### .getScoreArea(img)
 
 - `img` - The image to read from
 
 Returns the same image, cropped around the score area (for both red and blue).
 
-### .getRedScoreArea(img)
+#### .getRedScoreArea(img)
 
 - `img` - The image to read from
 
 Returns the same image, cropped around the red score area.
 
-### .getBlueScoreArea(img)
+#### .getBlueScoreArea(img)
 
 - `img` - The image to read from
 
 Returns the same image, cropped around the blue score area.
 
-### .matchTemplate(img, template)
+#### .matchTemplate(img, template)
 
 - `img` - The base image
 - `template` - The template image to match against `img`
 
 Returns two values, the top left point of the template match, and the bottom
 right point. This is mostly used internally.
+
+### Classes
+
+#### Alliance
+
+= `score` - The alliance's score
+- `teams` - An array of team numbers (NOT YET IMPLEMENTED)
+
+#### OngoingMatchDetails
+
+- `match` - The match identification, such as "Qualifications 16"
+- `time` - The time remaining in the match
+- `red` - An [Alliance](#alliance) class for the red alliance
+- `blue` - An [Alliance](#alliance) class for the blue alliance
+
+<!--
+#### CompletedMatchDetails
+
+- `match` - The match identification, such as "Qualifications 16"
+- `winner` - A string containing the match winner; either "red" or "blue"
+- `red` - An [Alliance](#alliance) class for the red alliance
+- `blue` - An [Alliance](#alliance) class for the blue alliance
+-->

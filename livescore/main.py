@@ -6,6 +6,8 @@ import imutils
 import pkg_resources
 from PIL import Image
 
+from details import Alliance, OngoingMatchDetails
+
 
 class Livescore:
     def __init__(self, options={}):
@@ -71,7 +73,10 @@ class Livescore:
                                   width=int(template_width/1280.0*img_width))
         top_left, bottom_right = self.matchTemplate(img, template)
 
-        return img[top_left[1]:bottom_right[1], top_left[0]:bottom_right[0]]
+        located = img[top_left[1]:bottom_right[1], top_left[0]:bottom_right[0]]
+        h, w = located.shape[:2]
+
+        return located[:, int(w*0.125):int(w*0.5)]
 
     def getTimeArea(self, img):
         template_width = self.TEMPLATE_TIME.shape[1]
@@ -105,20 +110,14 @@ class Livescore:
     def read(self, img):
         scoreboard = self.getScoreboard(img)
 
-        top_bar = self.getTopBar(scoreboard)
-        long_match_string = pytesseract.image_to_string(
-                                                Image.fromarray(top_bar),
-                                                config='--psm 7').strip()
-        m = re.search('([a-zA-z]+) ([1-9]+)( of ...?)?', long_match_string)
-        if m is not None:
-            match = m.group(1) + ' ' + m.group(2)
-        else:
-            match = False
-
+        top_cropped = self.getTopBar(scoreboard)
         time_cropped = self.getTimeArea(scoreboard)
         red_cropped = self.getRedScoreArea(scoreboard)
         blue_cropped = self.getBlueScoreArea(scoreboard)
 
+        top_cropped = cv2.inRange(top_cropped,
+                                  self.BLACK_LOW,
+                                  self.BLACK_HIGH)
         time_cropped = cv2.inRange(time_cropped,
                                    self.BLACK_LOW,
                                    self.BLACK_HIGH)
@@ -128,6 +127,13 @@ class Livescore:
         red_cropped = cv2.inRange(red_cropped,
                                   self.WHITE_LOW,
                                   self.WHITE_HIGH)
+
+        long_match = pytesseract.image_to_string(Image.fromarray(top_cropped),
+                                                 config='--psm 7').strip()
+        match = None
+        m = re.search('([a-zA-z]+) ([1-9]+)( of ...?)?', long_match)
+        if m is not None:
+            match = m.group(1) + ' ' + m.group(2)
 
         config = '--psm 8 -c tessedit_char_whitelist=1234567890 digits'
 
@@ -141,13 +147,7 @@ class Livescore:
                                             Image.fromarray(red_cropped),
                                             config=config).strip()
 
-        return {
-            'match': match,
-            'time': int(time_remaining) if time_remaining.isdigit() else False,
-            'red': {
-                'score': int(red_score) if red_score.isdigit() else False
-            },
-            'blue': {
-                'score': int(blue_score) if blue_score.isdigit() else False
-            }
-        }
+        return OngoingMatchDetails(match=match,
+                                   time=time_remaining,
+                                   red=Alliance(score=red_score),
+                                   blue=Alliance(score=blue_score))
