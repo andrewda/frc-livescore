@@ -18,9 +18,11 @@ for f in os.listdir('./images'):
     # Images named in format: `red_blue_time.png`
     expected_values = values[f]
 
-    expected_red = int(expected_values['score']['red'])
-    expected_blue = int(expected_values['score']['blue'])
-    expected_time = int(expected_values['time'])
+    expected_red_score = expected_values['score']['red']
+    expected_blue_score = expected_values['score']['blue']
+    expected_red_teams = expected_values['teams']['red']
+    expected_blue_teams = expected_values['teams']['blue']
+    expected_time = expected_values['time']
     expected_match = expected_values['match']
 
     # Read the image with OpenCV
@@ -30,8 +32,10 @@ for f in os.listdir('./images'):
     data = frc.read(image)
 
     if data.time == expected_time and \
-       data.red.score == expected_red and \
-       data.blue.score == expected_blue:
+       data.red.score == expected_red_score and \
+       data.blue.score == expected_blue_score and \
+       data.red.teams == expected_red_teams and \
+       data.blue.teams == expected_blue_teams:
         print '{} processing success'.format(f)
     else:
         print '{} processing error'.format(f)

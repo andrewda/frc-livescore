@@ -1,7 +1,7 @@
 class Alliance:
     def __init__(self, score=None, teams=[]):
         self.score = int(score) if score is not None and score.isdigit() else None
-        self.teams = teams
+        self.teams = [int(team) if team is not None and team.isdigit() else None for team in teams]
 
 
 class OngoingMatchDetails:
