@@ -59,6 +59,8 @@ print('Red {0} : {2} : {1} Blue'.format(data.red.score,
     - `scores` - A template image to match for the scores
     - `time` - A template image to match for the time remaining
     - `top` - A template image to match for the top bar
+    - `red_teams` - A template image to match for the red teams
+    - `blue_team` - A template image to match for the blue teams
 
 Creates and returns a new Livescore instance with specified options.
 
@@ -106,6 +108,18 @@ Returns the same image, cropped around the red score area.
 
 Returns the same image, cropped around the blue score area.
 
+#### .getRedTeamsArea(img)
+
+- `img` - The image to read from
+
+Returns the same image, cropped around the red teams area.
+
+#### .getBlueTeamsArea(img)
+
+- `img` - The image to read from
+
+Returns the same image, cropped around the blue teams area.
+
 #### .matchTemplate(img, template)
 
 - `img` - The base image
@@ -119,7 +133,7 @@ right point. This is mostly used internally.
 #### Alliance
 
 = `score` - The alliance's score
-- `teams` - An array of team numbers (NOT YET IMPLEMENTED)
+- `teams` - An array of team numbers
 
 #### OngoingMatchDetails
 
