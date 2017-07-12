@@ -44,13 +44,13 @@ class Livescore:
         if 'red_teams' not in options and 'blue_teams' not in options:
             self.TEMPLATE_RED_TEAMS = cv2.imread(templates['red_teams'], 0)
             self.TEMPLATE_BLUE_TEAMS = cv2.flip(self.TEMPLATE_RED_TEAMS, 1)
-        elif 'red_teams' in options:
+        elif 'blue_teams' not in options:  # 'red_teams' in options
             self.TEMPLATE_RED_TEAMS = options['red_teams']
             self.TEMPLATE_BLUE_TEAMS = cv2.flip(self.TEMPLATE_RED_TEAMS, 1)
-        elif 'blue_teams' in options:
+        elif 'red_teams' not in options:  # 'blue_teams' in options
             self.TEMPLATE_BLUE_TEAMS = options['blue_teams']
             self.TEMPLATE_RED_TEAMS = cv2.flip(self.TEMPLATE_BLUE_TEAMS, 1)
-        else:
+        else: # both in options
             self.TEMPLATE_RED_TEAMS = options['red_teams']
             self.TEMPLATE_BLUE_TEAMS = options['blue_teams']
 
