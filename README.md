@@ -60,7 +60,7 @@ print('Red {0} : {2} : {1} Blue'.format(data.red.score,
     - `time` - A template image to match for the time remaining
     - `top` - A template image to match for the top bar
     - `red_teams` - A template image to match for the red teams
-    - `blue_team` - A template image to match for the blue teams
+    - `blue_teams` - A template image to match for the blue teams
 
 Creates and returns a new Livescore instance with specified options.
 

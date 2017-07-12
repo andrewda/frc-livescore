@@ -71,47 +71,32 @@ class Livescore:
 
         return top_left, bottom_right
 
-    def getScoreboard(self, img):
-        template_width = self.TEMPLATE_SCOREBOARD.shape[1]
+    def getArea(self, img, template_img):
+        template_width = template_img.shape[1]
         img_width = img.shape[1]
-        template = imutils.resize(self.TEMPLATE_SCOREBOARD,
+        template = imutils.resize(template_img,
                                   width=int(template_width/1280.0*img_width))
         top_left, bottom_right = self.matchTemplate(img, template)
 
         return img[top_left[1]:bottom_right[1], top_left[0]:bottom_right[0]]
 
-    def getTopBar(self, img):
-        template_width = self.TEMPLATE_TOP.shape[1]
-        img_width = img.shape[1]
-        template = imutils.resize(self.TEMPLATE_TOP,
-                                  width=int(template_width/1280.0*img_width))
-        top_left, bottom_right = self.matchTemplate(img, template)
+    def getScoreboard(self, img):
+        return self.getArea(img, self.TEMPLATE_SCOREBOARD)
 
-        located = img[top_left[1]:bottom_right[1], top_left[0]:bottom_right[0]]
+    def getTopBar(self, img):
+        located = self.getArea(img, self.TEMPLATE_TOP)
         h, w = located.shape[:2]
 
         return located[:, int(w*0.125):int(w*0.5)]
 
     def getTimeArea(self, img):
-        template_width = self.TEMPLATE_TIME.shape[1]
-        img_width = img.shape[1]
-        template = imutils.resize(self.TEMPLATE_TIME,
-                                  width=int(template_width/1280.0*img_width))
-        top_left, bottom_right = self.matchTemplate(img, template)
-
-        located = img[top_left[1]:bottom_right[1], top_left[0]:bottom_right[0]]
+        located = self.getArea(img, self.TEMPLATE_TIME)
         h, w = located.shape[:2]
 
         return located[int(h*0.16):int(h*0.84), int(w*0.42):int(w*0.58)]
 
     def getScoreArea(self, img):
-        template_width = self.TEMPLATE_SCORES.shape[1]
-        img_width = img.shape[1]
-        template = imutils.resize(self.TEMPLATE_SCORES,
-                                  width=int(template_width/1280.0*img_width))
-        top_left, bottom_right = self.matchTemplate(img, template)
-
-        return img[top_left[1]:bottom_right[1], top_left[0]:bottom_right[0]]
+        return self.getArea(img, self.TEMPLATE_SCORES)
 
     def getRedScoreArea(self, img):
         score_area = self.getScoreArea(img)
@@ -122,22 +107,14 @@ class Livescore:
         return score_area[:, score_area.shape[1]/2:score_area.shape[1]]
 
     def getRedTeamsArea(self, img):
-        template_width = self.TEMPLATE_RED_TEAMS.shape[1]
-        img_width = img.shape[1]
-        template = imutils.resize(self.TEMPLATE_RED_TEAMS,
-                                  width=int(template_width/1280.0*img_width))
-        top_left, bottom_right = self.matchTemplate(img, template)
-
-        return img[top_left[1]:bottom_right[1], top_left[0]:bottom_right[0]]
+        area = self.getArea(img, self.TEMPLATE_RED_TEAMS)
+        team_height = int(area.shape[0] / 3)
+        return [area[team_height * i:team_height * (i + 1), :] for i in range(3)]
 
     def getBlueTeamsArea(self, img):
-        template_width = self.TEMPLATE_BLUE_TEAMS.shape[1]
-        img_width = img.shape[1]
-        template = imutils.resize(self.TEMPLATE_BLUE_TEAMS,
-                                  width=int(template_width/1280.0*img_width))
-        top_left, bottom_right = self.matchTemplate(img, template)
-
-        return img[top_left[1]:bottom_right[1], top_left[0]:bottom_right[0]]
+        area =  self.getArea(img, self.TEMPLATE_BLUE_TEAMS)
+        team_height = int(area.shape[0] / 3)
+        return [area[team_height * i:team_height * (i + 1), :] for i in range(3)]
 
     def read(self, img):
         scoreboard = self.getScoreboard(img)
@@ -161,12 +138,15 @@ class Livescore:
         red_score_cropped = cv2.inRange(red_score_cropped,
                                         self.WHITE_LOW,
                                         self.WHITE_HIGH)
-        blue_teams_cropped = cv2.inRange(blue_teams_cropped,
-                                         self.BLACK_LOW,
-                                         self.BLACK_HIGH)
-        red_teams_cropped = cv2.inRange(red_teams_cropped,
-                                        self.BLACK_LOW,
-                                        self.BLACK_HIGH)
+        for i in range(3):
+            blue_teams_cropped[i] = cv2.inRange(blue_teams_cropped[i],
+                                                self.BLACK_LOW,
+                                                self.BLACK_HIGH)
+
+        for i in range(3):
+            red_teams_cropped[i] = cv2.inRange(red_teams_cropped[i],
+                                               self.BLACK_LOW,
+                                               self.BLACK_HIGH)
 
         long_match = pytesseract.image_to_string(Image.fromarray(top_cropped),
                                                  config='--psm 7').strip()
@@ -180,23 +160,25 @@ class Livescore:
         time_remaining = pytesseract.image_to_string(
                                             Image.fromarray(time_cropped),
                                             config=config).strip()
+
         blue_score = pytesseract.image_to_string(
                                             Image.fromarray(blue_score_cropped),
                                             config=config).strip()
+
         red_score = pytesseract.image_to_string(
                                             Image.fromarray(red_score_cropped),
                                             config=config).strip()
 
-        team_height = int(red_teams_cropped.shape[0] / 3)
-
         blue_teams = [int(pytesseract.image_to_string(
-                      Image.fromarray(blue_teams_cropped[team_height * i:team_height * (i + 1), :]),
+                      Image.fromarray(blue_teams_cropped[i]),
                       config=config).strip())
                       for i in range(3)]
+
         red_teams = [int(pytesseract.image_to_string(
-                     Image.fromarray(red_teams_cropped[team_height * i:team_height * (i + 1), :]),
+                     Image.fromarray(red_teams_cropped[i]),
                      config=config).strip())
                      for i in range(3)]
+
 
         return OngoingMatchDetails(match=match,
                                    time=time_remaining,
