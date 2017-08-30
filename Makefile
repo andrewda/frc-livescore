@@ -1,6 +1,9 @@
 init:
 	pip install -r requirements.txt
 
+test:
+	cd tests && python test.py
+
 flake8:
 	pip install flake8
 	flake8 livescore --statistics --show-source

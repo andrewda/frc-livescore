@@ -11,6 +11,7 @@ from details import Alliance, OngoingMatchDetails
 
 class Livescore:
     def __init__(self, options={}):
+        local_path = pkg_resources.resource_filename(__name__, 'tessdata')
         template_path = pkg_resources.resource_filename(__name__, 'templates')
 
         templates = {
@@ -40,11 +41,13 @@ class Livescore:
         else:
             self.TEMPLATE_TOP = options['top']
 
-        self.WHITE_LOW = np.array([200, 200, 200])
+        self.WHITE_LOW = np.array([185, 185, 185])
         self.WHITE_HIGH = np.array([255, 255, 255])
 
         self.BLACK_LOW = np.array([0, 0, 0])
         self.BLACK_HIGH = np.array([105, 105, 135])
+
+        self.local_path = local_path
 
     def matchTemplate(self, img, template):
         res = cv2.matchTemplate(cv2.cvtColor(img, cv2.COLOR_RGB2GRAY),
@@ -101,11 +104,11 @@ class Livescore:
 
     def getRedScoreArea(self, img):
         score_area = self.getScoreArea(img)
-        return score_area[:, 0:score_area.shape[1]/2]
+        return score_area[:, int((score_area.shape[1]/2)*0.05):int((score_area.shape[1]/2)*0.95)]
 
     def getBlueScoreArea(self, img):
         score_area = self.getScoreArea(img)
-        return score_area[:, score_area.shape[1]/2:score_area.shape[1]]
+        return score_area[:, int((score_area.shape[1]/2)*1.05):int(score_area.shape[1]*0.95)]
 
     def read(self, img):
         scoreboard = self.getScoreboard(img)
@@ -129,13 +132,15 @@ class Livescore:
                                   self.WHITE_HIGH)
 
         long_match = pytesseract.image_to_string(Image.fromarray(top_cropped),
-                                                 config='--psm 7').strip()
+                                                 config='--psm 7 -l consolas \
+                                                         --tessdata-dir {}'.format(self.local_path)).strip()
         match = None
         m = re.search('([a-zA-z]+) ([1-9]+)( of ...?)?', long_match)
         if m is not None:
             match = m.group(1) + ' ' + m.group(2)
 
-        config = '--psm 8 -c tessedit_char_whitelist=1234567890 digits'
+        config = '--psm 8 -l consolas --tessdata-dir {} \
+                  -c tessedit_char_whitelist=1234567890 digits'.format(self.local_path)
 
         time_remaining = pytesseract.image_to_string(
                                             Image.fromarray(time_cropped),

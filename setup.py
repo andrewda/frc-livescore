@@ -11,5 +11,5 @@ setup(
     keywords = ['frc', 'score', 'robotics'],
     license='MIT',
     packages=find_packages(exclude=('tests', 'docs')),
-    package_data={'livescore': ['templates/*.png']}
+    package_data={'livescore': ['templates/*.png', 'tessdata/*.traineddata']}
 )

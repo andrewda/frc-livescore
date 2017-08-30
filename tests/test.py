@@ -6,6 +6,8 @@ import cv2
 # Initialize new Livescore instance
 frc = Livescore()
 
+error = False
+
 # Read all images from the ./images/ directory
 for f in os.listdir('./images'):
     # Images named in format: `red_blue_time.png`
@@ -31,4 +33,7 @@ for f in os.listdir('./images'):
         print 'Received: {}'.format([data.red.score,
                                      data.blue.score,
                                      data.time])
-        sys.exit(1)
+        error = True
+
+if error:
+    sys.exit(1)
