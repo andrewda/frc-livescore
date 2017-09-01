@@ -45,7 +45,7 @@ class Livescore:
         self.WHITE_HIGH = np.array([255, 255, 255])
 
         self.BLACK_LOW = np.array([0, 0, 0])
-        self.BLACK_HIGH = np.array([105, 105, 135])
+        self.BLACK_HIGH = np.array([135, 135, 155])
 
         self.local_path = local_path
 
@@ -132,8 +132,7 @@ class Livescore:
                                   self.WHITE_HIGH)
 
         long_match = pytesseract.image_to_string(Image.fromarray(top_cropped),
-                                                 config='--psm 7 -l consolas \
-                                                         --tessdata-dir {}'.format(self.local_path)).strip()
+                                                 config='--psm 7').strip()
         match = None
         m = re.search('([a-zA-z]+) ([1-9]+)( of ...?)?', long_match)
         if m is not None:
