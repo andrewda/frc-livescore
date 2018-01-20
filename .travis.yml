@@ -42,10 +42,6 @@ install:
 
   - pip install . --upgrade
 
-  - pip show cv || echo 'nope'
-  - pip show cv2 || echo 'nope'
-  - pip show livescore || echo 'nope'
-
   - echo $PYTHONPATH
   - ls /home/travis/virtualenv/python2.7.13/lib/python2.7/site-packages/livescore/ || echo 'nope'
   - ls /home/travis/virtualenv/python2.7.13/lib/python2.7/site-packages/livescore/tessdata || echo 'nope'
