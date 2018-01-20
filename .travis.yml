@@ -1,23 +1,17 @@
 language: python
-
-python: 2.7
-
 dist: trusty
-
+python: 3.6.3
 cache:
   pip: true
   directories:
     - opencv/
-
 before_install:
   - sudo apt-get update
-
 install:
-
   # OpenCV dependencies - Details available at: http://docs.opencv.org/trunk/doc/tutorials/introduction/linux_install/linux_install.html
   - sudo apt-get install -y build-essential
   - sudo apt-get install -y cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
-  - sudo apt-get install -y python-dev python-numpy tesseract-ocr
+  - sudo apt-get install -y python3-numpy tesseract-ocr
 
   # Install python dependencies
   - make
@@ -38,13 +32,9 @@ install:
   # We need to return to the repo "root" folder, so we can then 'cd' into the C++ project folder.
   - cd ../../
 
-  - export PYTHONPATH=$PYTHONPATH:/usr/lib/python2.7/site-packages/:/usr/local/lib/python2.7/site-packages/
+  - export PYTHONPATH=$PYTHONPATH:/home/travis/virtualenv/python3.6.3/lib/python3.6/site-packages
 
   - pip install . --upgrade
-
-  - echo $PYTHONPATH
-  - ls /home/travis/virtualenv/python2.7.13/lib/python2.7/site-packages/livescore/ || echo 'nope'
-  - ls /home/travis/virtualenv/python2.7.13/lib/python2.7/site-packages/livescore/tessdata || echo 'nope'
-
+  - pip install opencv-python
 script:
   - make test
