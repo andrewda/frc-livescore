@@ -39,12 +39,16 @@ for f in os.listdir('./images'):
         print '{} processing success'.format(f)
     else:
         print '{} processing error'.format(f)
-        print '\tExpected: {}'.format([expected_red,
-                                       expected_blue,
+        print '\tExpected: {}'.format([expected_red_score,
+                                       expected_blue_score,
+                                       expected_red_teams,
+                                       expected_blue_teams,
                                        expected_time,
                                        expected_match])
         print '\tReceived: {}'.format([data.red.score,
                                        data.blue.score,
+                                       data.red.teams,
+                                       data.blue.teams,
                                        data.time,
                                        data.match])
         error = True
