@@ -12,6 +12,7 @@ before_install:
 
 install:
 
+  - ls /usr/lib/
   - ls /usr/lib/x86_64-linux-gnu/
 
   # OpenCV dependencies - Details available at: http://docs.opencv.org/trunk/doc/tutorials/introduction/linux_install/linux_install.html
