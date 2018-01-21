@@ -17,7 +17,7 @@ else
     git checkout 3.1.0;
     mkdir build;
     cd build;
-    cmake -D CMAKE_BUILD_TYPE=RELEAS \
+    cmake -D CMAKE_BUILD_TYPE=RELEASE \
           -D CMAKE_INSTALL_PREFIX=/usr/local \
           -D WITH_TBB=ON \
           -D BUILD_NEW_PYTHON_SUPPORT=ON \
