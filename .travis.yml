@@ -1,6 +1,6 @@
 language: python
 dist: precise
-python: 3.6
+python: 3.6.2
 cache:
   pip: true
   directories:
