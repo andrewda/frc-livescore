@@ -19,7 +19,7 @@ install:
   - ls /home/travis/virtualenv/python3.6.3/lib/python3.6/site-packages
   # - ls /usr/lib/python3.4/site-packages
   - ls /
-  - ls lib
+  - ls /lib
   - ls ~
 
   # OpenCV dependencies - Details available at: http://docs.opencv.org/trunk/doc/tutorials/introduction/linux_install/linux_install.html
