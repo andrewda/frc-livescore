@@ -1,15 +1,12 @@
 language: python
-
+dist: precise
 python: 3.6
-
 cache:
   pip: true
   directories:
     - opencv/
-
 before_install:
   - sudo apt-get update
-
 install:
 
   - which python
@@ -61,7 +58,5 @@ install:
   # - ls /home/travis/virtualenv/python2.7.13/lib/python2.7/site-packages/livescore/tessdata || echo 'nope'
 
   - ls /home/travis/virtualenv/python3.6.3/lib/python3.6/site-packages || echo "heckin balogne"
-
-
 script:
   - make test
