@@ -12,6 +12,7 @@ before_install:
 
 install:
 
+  - which python
   - python -m site
   - ls /usr/include/
   - ls /usr/include/x86_64-linux-gnu/ || echo "noop"
