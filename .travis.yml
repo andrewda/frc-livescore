@@ -15,6 +15,9 @@ install:
   - python -m site
   - ls /usr/local/lib/
   - ls /usr/lib/python3/
+  - ls /home/travis/.local/lib/python3.6/site-packages
+  - ls /home/travis/virtualenv/python3.6.3/lib/python3.6/site-packages
+  - ls /usr/lib/python3.4/site-packages
 
   # OpenCV dependencies - Details available at: http://docs.opencv.org/trunk/doc/tutorials/introduction/linux_install/linux_install.html
   - sudo apt-get install -y build-essential
@@ -47,6 +50,8 @@ install:
   - echo $PYTHONPATH
   # - ls /home/travis/virtualenv/python2.7.13/lib/python2.7/site-packages/livescore/ || echo 'nope'
   # - ls /home/travis/virtualenv/python2.7.13/lib/python2.7/site-packages/livescore/tessdata || echo 'nope'
+
+  - ls /usr/lib/python3.4/site-packages
 
   - ls /usr/lib/python3/site-packages
   - ls /home/travis/virtualenv/ || echo 'nope'
