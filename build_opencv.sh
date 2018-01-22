@@ -20,8 +20,8 @@ else
     cmake -D CMAKE_BUILD_TYPE=RELEASE \
           -D CMAKE_INSTALL_PREFIX=/usr/local \
           -D WITH_TBB=ON \
-          -D PYTHON3_EXECUTABLE=/home/travis/virtualenv/python3.6.3/bin/python \
-          -D PYTHON_INCLUDE_DIR=/home/travis/virtualenv/python3.6.3/include/python3.6m \
+          -D PYTHON3_EXECUTABLE=/home/travis/virtualenv/python3.6.2/bin/python \
+          -D PYTHON_INCLUDE_DIR=/home/travis/virtualenv/python3.6.2/include/python3.6m \
           -D BUILD_NEW_PYTHON_SUPPORT=ON \
           -D BUILD_OPENCV_PYTHON3=ON \
           -D WITH_V4L=ON \
