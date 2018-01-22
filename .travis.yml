@@ -60,9 +60,6 @@ install:
   # - ls /home/travis/virtualenv/python2.7.13/lib/python2.7/site-packages/livescore/ || echo 'nope'
   # - ls /home/travis/virtualenv/python2.7.13/lib/python2.7/site-packages/livescore/tessdata || echo 'nope'
 
-  - ls /usr/lib/python3.4/site-packages
-
-  - ls /usr/lib/python3/site-packages
   - ls /home/travis/virtualenv/python3.6.3/lib/python3.6/site-packages || echo "heckin balogne"
 
 
