@@ -12,12 +12,13 @@ before_install:
 
 install:
 
-  - ls /usr/lib/
+  - ls /usr/local/lib/
+  - ls /usr/lib/python3/site-packages
 
   # OpenCV dependencies - Details available at: http://docs.opencv.org/trunk/doc/tutorials/introduction/linux_install/linux_install.html
   - sudo apt-get install -y build-essential
   - sudo apt-get install -y cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
-  - sudo apt-get install -y python3.6-dev python3-numpy tesseract-ocr
+  - sudo apt-get install -y python3-numpy tesseract-ocr
 
   # Install python dependencies
   - make
@@ -46,6 +47,7 @@ install:
   # - ls /home/travis/virtualenv/python2.7.13/lib/python2.7/site-packages/livescore/ || echo 'nope'
   # - ls /home/travis/virtualenv/python2.7.13/lib/python2.7/site-packages/livescore/tessdata || echo 'nope'
 
+  - ls /usr/lib/python3/site-packages
   - ls /home/travis/virtualenv/ || echo 'nope'
   - ls /home/travis/virtualenv/python3.4.6/ || echo 'nope'
   - ls /home/travis/virtualenv/python3.4.6/lib/ || echo 'nope'
