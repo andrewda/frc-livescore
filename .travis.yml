@@ -15,7 +15,7 @@ install:
   - python -m site
   - ls /usr/local/lib/
   - ls /usr/lib/python3/
-  - ls /home/travis/.local/lib/python3.6/site-packages
+  # - ls /home/travis/.local/lib/python3.6/site-packages
   - ls /home/travis/virtualenv/python3.6.3/lib/python3.6/site-packages
   - ls /usr/lib/python3.4/site-packages
 
