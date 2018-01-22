@@ -15,6 +15,7 @@ install:
   - which python
   - python -m sysconfig
   - python -m site
+  - python -c "import numpy"
   - ls /usr/include/
   - ls /usr/include/x86_64-linux-gnu/ || echo "noop"
   - ls /usr/lib/x86_64-linux-gnu/ || echo "noooooooop"
