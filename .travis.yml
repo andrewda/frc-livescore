@@ -13,6 +13,9 @@ before_install:
 install:
 
   - python -m site
+  - ls /usr/include/
+  - ls /usr/include/x86_64-linux-gnu/ || echo "noop"
+  - ls /usr/lib/x86_64-linux-gnu/ || echo "noooooooop"
   - ls /usr/local/lib/
   - ls /usr/lib/python3/
   # - ls /home/travis/.local/lib/python3.6/site-packages
