@@ -6,7 +6,7 @@ import imutils
 import pkg_resources
 from PIL import Image
 
-from details import Alliance, OngoingMatchDetails
+from .details import Alliance, OngoingMatchDetails
 
 
 class Livescore:
