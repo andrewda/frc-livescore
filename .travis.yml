@@ -49,7 +49,7 @@ install:
   - export PYTHONPATH=$PYTHONPATH:/home/travis/virtualenv/python3.6.3/lib/python3.6/site-packages
 
   - pip install . --upgrade
-  - pip install python-opencv
+  - pip install opencv-python
 
   - echo $PYTHONPATH
   # - ls /home/travis/virtualenv/python2.7.13/lib/python2.7/site-packages/livescore/ || echo 'nope'
