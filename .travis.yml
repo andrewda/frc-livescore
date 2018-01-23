@@ -1,6 +1,6 @@
 language: python
-dist: precise
-python: 3.6.2
+dist: trusty
+python: 3.6.3
 cache:
   pip: true
   directories:
@@ -19,11 +19,8 @@ install:
   - ls /usr/local/lib/
   - ls /usr/lib/python3/
   # - ls /home/travis/.local/lib/python3.6/site-packages
-  - ls /home/travis/virtualenv/python3.6.2/lib/python3.6/site-packages || echo "notta"
+  - ls /home/travis/virtualenv/python3.6.3/lib/python3.6/site-packages || echo "notta"
   # - ls /usr/lib/python3.4/site-packages
-  - ls /
-  - ls /lib
-  - ls ~
 
   # OpenCV dependencies - Details available at: http://docs.opencv.org/trunk/doc/tutorials/introduction/linux_install/linux_install.html
   - sudo apt-get install -y build-essential
@@ -49,14 +46,15 @@ install:
   # We need to return to the repo "root" folder, so we can then 'cd' into the C++ project folder.
   - cd ../../
 
-  - export PYTHONPATH=$PYTHONPATH:/home/travis/virtualenv/python3.6.2/lib/python3.6/site-packages
+  - export PYTHONPATH=$PYTHONPATH:/home/travis/virtualenv/python3.6.3/lib/python3.6/site-packages
 
   - pip install . --upgrade
+  - pip install python-opencv
 
   - echo $PYTHONPATH
   # - ls /home/travis/virtualenv/python2.7.13/lib/python2.7/site-packages/livescore/ || echo 'nope'
   # - ls /home/travis/virtualenv/python2.7.13/lib/python2.7/site-packages/livescore/tessdata || echo 'nope'
 
-  - ls /home/travis/virtualenv/python3.6.2/lib/python3.6/site-packages || echo "heckin balogne"
+  - ls /home/travis/virtualenv/python3.6.3/lib/python3.6/site-packages || echo "heckin balogne"
 script:
   - make test
