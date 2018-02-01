@@ -3,7 +3,7 @@ import os
 import cv2
 
 # Initialize new Livescore instance
-frc = Livescore()
+frc = Livescore(debug=True)
 
 # Read all images from the ./scenes/ directory
 for f in os.listdir('./scenes'):
@@ -13,6 +13,5 @@ for f in os.listdir('./scenes'):
     # Get score data
     data = frc.read(image)
 
-    print('Red {0} : {2} : {1} Blue'.format(data.red.score,
-                                            data.blue.score,
-                                            data.time))
+    print('{}: Match: {}, Time: {}, Red: {}, Blue: {}'.format(
+        f, data.match, data.time, data.red.score, data.blue.score))
