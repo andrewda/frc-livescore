@@ -1,3 +1,4 @@
+import colorsys
 import cv2
 import numpy as np
 import pytesseract
@@ -160,6 +161,85 @@ class Livescore:
 
         return red_score, blue_score, is_flipped
 
+    def _getFuelScores(self, img, debug_img, is_flipped):
+        # Left fuel score
+        left_tl = self._transformPoint((316, 123))
+        left_br = self._transformPoint((362, 152))
+        # Left fuel count
+        left_fuel_locs = [
+            self._transformPoint((355, 107)),
+            self._transformPoint((348, 86)),
+            self._transformPoint((332, 70)),
+            self._transformPoint((312, 64)),
+            self._transformPoint((289, 70)),
+            self._transformPoint((273, 86)),
+            self._transformPoint((264, 107)),
+            self._transformPoint((272, 130)),
+            self._transformPoint((289, 146)),
+        ]
+        # Right fuel score
+        right_tl = self._transformPoint((916, 123))
+        right_br = self._transformPoint((963, 152))
+        # Right fuel count
+        right_fuel_locs = [
+            self._transformPoint((925, 107)),
+            self._transformPoint((930, 86)),
+            self._transformPoint((944, 70)),
+            self._transformPoint((967, 64)),
+            self._transformPoint((991, 70)),
+            self._transformPoint((1007, 86)),
+            self._transformPoint((1015, 107)),
+            self._transformPoint((1007, 130)),
+            self._transformPoint((991, 146)),
+        ]
+
+        left_fuel_score = self._parseDigits(self._getImgCropThresh(img, left_tl, left_br))
+        right_fuel_score = self._parseDigits(self._getImgCropThresh(img, right_tl, right_br))
+
+        left_fuel_count = 0
+        for x, y in left_fuel_locs:
+            bgr = img[y, x, :]
+            hsv = colorsys.rgb_to_hsv(float(bgr[2])/255, float(bgr[1])/255, float(bgr[0])/255)
+            if hsv[1] > 0.2:
+                left_fuel_count += 1
+            else:
+                break
+
+        right_fuel_count = 0
+        for x, y in right_fuel_locs:
+            bgr = img[y, x, :]
+            hsv = colorsys.rgb_to_hsv(float(bgr[2])/255, float(bgr[1])/255, float(bgr[0])/255)
+            if hsv[1] > 0.2:
+                right_fuel_count += 1
+            else:
+                break
+
+        if is_flipped:
+            red_fuel_score = right_fuel_score
+            red_fuel_count = right_fuel_count
+            blue_fuel_score = left_fuel_score
+            blue_fuel_count = left_fuel_count
+        else:
+            red_fuel_score = left_fuel_score
+            red_fuel_count = left_fuel_count
+            blue_fuel_score = right_fuel_score
+            blue_fuel_count = right_fuel_count
+
+        if self._debug:
+            left_color = (255, 255, 0) if is_flipped else (255, 0, 255)
+            right_color = (255, 0, 255) if is_flipped else (255, 255, 0)
+            left_box = self._cornersToBox(left_tl, left_br)
+            right_box = self._cornersToBox(right_tl, right_br)
+            self._drawBox(debug_img, left_box, left_color)
+            self._drawBox(debug_img, right_box, right_color)
+            for point in left_fuel_locs:
+                cv2.circle(debug_img, point, 2, left_color, -1)
+            for point in right_fuel_locs:
+                cv2.circle(debug_img, point, 2, right_color, -1)
+
+
+        return red_fuel_score, red_fuel_count, blue_fuel_score, blue_fuel_count
+
     def _getTimeRemaining(self, img, debug_img):
         tl = self._transformPoint((605, 56))
         br = self._transformPoint((672, 82))
@@ -179,6 +259,7 @@ class Livescore:
 
         match = self._getMatch(img, debug_img)
         red_score, blue_score, is_flipped = self._getScores(img, debug_img)
+        red_fuel_score, red_fuel_count, blue_fuel_score, blue_fuel_count = self._getFuelScores(img, debug_img, is_flipped)
         time_remaining = self._getTimeRemaining(img, debug_img)
 
         if self._debug:
@@ -190,8 +271,8 @@ class Livescore:
             return OngoingMatchDetails(
                 match=match,
                 time=time_remaining,
-                red=Alliance(score=red_score),
-                blue=Alliance(score=blue_score))
+                red=Alliance(score=red_score, fuel_score=red_fuel_score, fuel_count=red_fuel_count),
+                blue=Alliance(score=blue_score, fuel_score=blue_fuel_score, fuel_count=blue_fuel_count))
         else:
             return None
 

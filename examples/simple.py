@@ -13,5 +13,14 @@ for f in os.listdir('./scenes'):
     # Get score data
     data = frc.read(image)
 
-    print('{}: Match: {}, Time: {}, Red: {}, Blue: {}'.format(
-        f, data.match, data.time, data.red.score, data.blue.score))
+    print('{}: Match: {}, Time: {}, Red: {}, Blue: {}, Red Fuel: {} + {}/9, Blue Fuel: {} + {}/9'.format(
+        f,
+        data.match,
+        data.time,
+        data.red.score,
+        data.blue.score,
+        data.red.fuel_score,
+        data.red.fuel_count,
+        data.blue.fuel_score,
+        data.blue.fuel_count,
+    ))

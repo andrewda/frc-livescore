@@ -1,7 +1,9 @@
 class Alliance:
-    def __init__(self, score=None, teams=[]):
-        self.score = score
+    def __init__(self, score=None, teams=[], fuel_score=None, fuel_count=None):
         self.teams = teams
+        self.score = score
+        self.fuel_score = fuel_score
+        self.fuel_count = fuel_count
 
 
 class OngoingMatchDetails:
