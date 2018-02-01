@@ -3,3 +3,5 @@ dist/
 
 .egg
 *.egg-info
+
+*.pyc
