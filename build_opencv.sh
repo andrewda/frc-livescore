@@ -11,6 +11,10 @@ else
     # No OpenCV cache – clone and make the files
     echo "No cache found - cloning and making files."
     rm -r opencv
+    git clone https://github.com/opencv/opencv_contrib.git
+    cd opencv_contrib
+    git checkout 3.1.0
+    cd ..
     git clone https://github.com/opencv/opencv.git
     cd opencv
     git fetch origin --tags
@@ -28,6 +32,7 @@ else
           -D INSTALL_C_EXAMPLES=OFF \
           -D INSTALL_PYTHON_EXAMPLES=ON \
           -D BUILD_EXAMPLES=ON \
+          -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules \
           -D WITH_QT=ON \
           -D WITH_OPENGL=ON ..
     make -j8
