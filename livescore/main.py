@@ -172,25 +172,38 @@ class Livescore:
 
         return time_remaining
 
-    def read(self, img):
-        img = cv2.resize(img, (1280, 720))
-        self._findScoreOverlay(img)
+    def _getMatchDetails(self, img):
+        debug_img = None
+        if self._debug:
+            debug_img = img.copy()
 
-        if self._transform is not None:
-            debug_img = None
-            if self._debug:
-                debug_img = img.copy()
+        match = self._getMatch(img, debug_img)
+        red_score, blue_score, is_flipped = self._getScores(img, debug_img)
+        time_remaining = self._getTimeRemaining(img, debug_img)
 
-            match = self._getMatch(img, debug_img)
-            red_score, blue_score, is_flipped = self._getScores(img, debug_img)
-            time_remaining = self._getTimeRemaining(img, debug_img)
+        if self._debug:
+            cv2.imshow("ROIs", debug_img)
+            cv2.waitKey(1)
 
-            if self._debug:
-                cv2.imshow("ROIs", debug_img)
-                cv2.waitKey(0)
-
+        if match is not None and red_score is not None \
+                and blue_score is not None and time_remaining is not None:
             return OngoingMatchDetails(
                 match=match,
                 time=time_remaining,
                 red=Alliance(score=red_score),
                 blue=Alliance(score=blue_score))
+        else:
+            return None
+
+    def read(self, img):
+        img = cv2.resize(img, (1280, 720))
+
+        if self._transform is None:
+            self._findScoreOverlay(img)
+
+        match_details = self._getMatchDetails(img)
+        if match_details is None:
+            self._findScoreOverlay(img)
+            match_details = self._getMatchDetails(img)
+
+        return match_details
