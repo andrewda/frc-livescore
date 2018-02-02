@@ -3,7 +3,6 @@ import cv2
 import numpy as np
 import pytesseract
 import re
-import imutils
 import pkg_resources
 from PIL import Image
 
@@ -98,15 +97,15 @@ class Livescore:
             return cv2.inRange(cropped, self.BLACK_LOW, self.BLACK_HIGH)
 
     def _parseDigits(self, img):
-        config = '--psm 8 -l consolas --tessdata-dir {} \
-            -c tessedit_char_whitelist=1234567890 digits'.format(self.local_path)
+        config = '--psm 8 -c tessedit_char_whitelist=1234567890 --tessdata-dir {}'.format(self.local_path.replace('\\', '/'))
+
         string = pytesseract.image_to_string(
             Image.fromarray(img),
             config=config).strip()
-        if string:
+        if string and string.isdigit():
             return int(string)
         else:
-            return 0
+            return None
 
     def _drawBox(self, img, box, color):
         cv2.polylines(img, [box], True, color, 2, cv2.LINE_AA)
@@ -115,8 +114,9 @@ class Livescore:
         tl = self._transformPoint((155, 6))
         br = self._transformPoint((632, 43))
 
+        config = '--psm 7'
         long_match = pytesseract.image_to_string(
-            Image.fromarray(self._getImgCropThresh(img, tl, br)), config='--psm 7').strip()
+            Image.fromarray(self._getImgCropThresh(img, tl, br)), config=config).strip()
 
         match = None
         m = re.search('([a-zA-z]+) ([1-9]+)( of ...?)?', long_match)
