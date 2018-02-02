@@ -82,11 +82,11 @@ class Livescore2017(LivescoreBase):
 
     def _getScores(self, img, debug_img, is_flipped):
         # Left score limits
-        left_tl = self._transformPoint((496, 93))
-        left_br = self._transformPoint((634, 155))
+        left_tl = self._transformPoint((496, 90))
+        left_br = self._transformPoint((634, 152))
         # Right score limits
-        right_tl = self._transformPoint((644, 93))
-        right_br = self._transformPoint((784, 155))
+        right_tl = self._transformPoint((644, 90))
+        right_br = self._transformPoint((784, 152))
 
         left_score = self._parseDigits(self._getImgCropThresh(img, left_tl, left_br, white=True), use_trained_font=False)
         right_score = self._parseDigits(self._getImgCropThresh(img, right_tl, right_br, white=True), use_trained_font=False)
