@@ -87,6 +87,11 @@ class LivescoreBase(object):
 
     def _getImgCropThresh(self, img, tl, br, white=False):
         cropped = img[tl[1]:br[1], tl[0]:br[0]]
+        height = cropped.shape[0]
+        if height < 50:
+            scale = 50.0 / height
+            cropped = cv2.resize(cropped, (int(cropped.shape[1] * scale), int(cropped.shape[0] * scale)))
+
         if white:
             return cv2.inRange(cropped, self._WHITE_LOW, self._WHITE_HIGH)
         else:
