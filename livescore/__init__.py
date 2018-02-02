@@ -1,2 +1,2 @@
 # flake8: noqa
-from .main import Livescore
+from .Livescore2017 import Livescore2017
