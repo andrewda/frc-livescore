@@ -64,10 +64,11 @@ class LivescoreBase(object):
                     'tx': t[0, 2],
                     'ty': t[1, 2],
                 }
-                return
+                return True
 
         print("Not enough matches are found - {}/{}".format(len(good), self._MIN_MATCH_COUNT))
         self._transform = None
+        return False
 
     def _transformPoint(self, point):
         # Transforms a point from template coordinates to image coordinates
@@ -105,3 +106,18 @@ class LivescoreBase(object):
 
     def _drawBox(self, img, box, color):
         cv2.polylines(img, [box], True, color, 2, cv2.LINE_AA)
+
+    def read(self, img):
+        img = cv2.resize(img, (1280, 720))
+
+        if self._transform is None:
+            if not self._findScoreOverlay(img):
+                return None
+
+        match_details = self._getMatchDetails(img)
+        if match_details is None:
+            if not self._findScoreOverlay(img):
+                return None
+            match_details = self._getMatchDetails(img)
+
+        return match_details

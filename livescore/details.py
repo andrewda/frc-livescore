@@ -7,8 +7,9 @@ class Alliance:
 
 
 class OngoingMatchDetails:
-    def __init__(self, match=None, time=None, red=Alliance(), blue=Alliance()):
+    def __init__(self, match=None, mode=None, time=None, red=Alliance(), blue=Alliance()):
         self.match = match
+        self.mode = mode
         self.time = time
         self.red = red
         self.blue = blue

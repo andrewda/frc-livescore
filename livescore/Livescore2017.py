@@ -32,17 +32,42 @@ class Livescore2017(LivescoreBase):
 
         return match
 
-    def _getTimeRemaining(self, img, debug_img):
-        tl = self._transformPoint((605, 56))
-        br = self._transformPoint((672, 82))
-
+    def _getTimeAndMode(self, img, debug_img):
+        # Find time remaining
+        tl = self._transformPoint((616, 53))
+        br = self._transformPoint((662, 79))
         time_remaining = self._parseDigits(self._getImgCropThresh(img, tl, br))
+
+        # Determine mode: 'pre_match', 'auto', 'teleop', or 'post_match'
+        mode_point = self._transformPoint((497, 70))
+        mode_point2 = self._transformPoint((581, 70))
+        mode_sample = img[mode_point[1], mode_point[0], :]
+        mode_sample2 = img[mode_point2[1], mode_point2[0], :]
+
+        hsv = colorsys.rgb_to_hsv(float(mode_sample[2])/255, float(mode_sample[1])/255, float(mode_sample[0])/255)
+        hsv2 = colorsys.rgb_to_hsv(float(mode_sample2[2])/255, float(mode_sample2[1])/255, float(mode_sample2[0])/255)
+
+        if time_remaining is None:
+            mode = None
+        if time_remaining == 0:
+            if hsv[1] > 0.6 and hsv2[1] > 0.6:  # Both saturated
+                mode = 'post_match'
+            elif hsv[1] > 0.6:  # First saturated
+                mode = 'auto'  # End of auton
+            else:
+                mode = 'pre_match'
+        elif time_remaining <= 15 and hsv2[1] < 0.6:
+            mode = 'auto'
+        else:
+            mode = 'teleop'
 
         if self._debug:
             box = self._cornersToBox(tl, br)
             self._drawBox(debug_img, box, (0, 255, 0))
+            cv2.circle(debug_img, mode_point, 2, (0, 255, 0), -1)
+            cv2.circle(debug_img, mode_point2, 2, (0, 255, 0), -1)
 
-        return time_remaining
+        return time_remaining, mode
 
     def _getFlipped(self, img, debug_img):
         # Sample point to determine red/blue side
@@ -165,9 +190,9 @@ class Livescore2017(LivescoreBase):
         if self._debug:
             debug_img = img.copy()
 
-        match = self._getMatchName(img, debug_img)
-        time_remaining = self._getTimeRemaining(img, debug_img)
         is_flipped = self._getFlipped(img, debug_img)
+        match = self._getMatchName(img, debug_img)
+        time_remaining, mode = self._getTimeAndMode(img, debug_img)
         red_score, blue_score = self._getScores(img, debug_img, is_flipped)
         red_fuel_score, red_fuel_count, blue_fuel_score, blue_fuel_count = self._getFuelScores(img, debug_img, is_flipped)
 
@@ -179,21 +204,9 @@ class Livescore2017(LivescoreBase):
                 and blue_score is not None and time_remaining is not None:
             return OngoingMatchDetails(
                 match=match,
+                mode=mode,
                 time=time_remaining,
                 red=Alliance(score=red_score, fuel_score=red_fuel_score, fuel_count=red_fuel_count),
                 blue=Alliance(score=blue_score, fuel_score=blue_fuel_score, fuel_count=blue_fuel_count))
         else:
             return None
-
-    def read(self, img):
-        img = cv2.resize(img, (1280, 720))
-
-        if self._transform is None:
-            self._findScoreOverlay(img)
-
-        match_details = self._getMatchDetails(img)
-        if match_details is None:
-            self._findScoreOverlay(img)
-            match_details = self._getMatchDetails(img)
-
-        return match_details
