@@ -32,21 +32,39 @@ class Livescore2017(LivescoreBase):
 
         return match
 
-    def _getScores(self, img, debug_img):
+    def _getTimeRemaining(self, img, debug_img):
+        tl = self._transformPoint((605, 56))
+        br = self._transformPoint((672, 82))
+
+        time_remaining = self._parseDigits(self._getImgCropThresh(img, tl, br))
+
+        if self._debug:
+            box = self._cornersToBox(tl, br)
+            self._drawBox(debug_img, box, (0, 255, 0))
+
+        return time_remaining
+
+    def _getFlipped(self, img, debug_img):
+        # Sample point to determine red/blue side
+        color_point = self._transformPoint((496, 95))
+        color_sample = img[color_point[1], color_point[0], :]
+        is_flipped = color_sample[0] > color_sample[2]  # More blue than red
+
+        if self._debug:
+            cv2.circle(debug_img, color_point, 2, (0, 255, 0), -1)
+
+        return is_flipped
+
+    def _getScores(self, img, debug_img, is_flipped):
         # Left score limits
         left_tl = self._transformPoint((496, 93))
         left_br = self._transformPoint((634, 155))
         # Right score limits
         right_tl = self._transformPoint((644, 93))
         right_br = self._transformPoint((784, 155))
-        # Sample point to determine red/blue side
-        color_point = self._transformPoint((496, 95))
 
         left_score = self._parseDigits(self._getImgCropThresh(img, left_tl, left_br, white=True), use_trained_font=False)
         right_score = self._parseDigits(self._getImgCropThresh(img, right_tl, right_br, white=True), use_trained_font=False)
-
-        color_sample = img[color_point[1], color_point[0], :]
-        is_flipped = color_sample[0] > color_sample[2]  # More blue than red
 
         if is_flipped:
             red_score = right_score
@@ -60,9 +78,8 @@ class Livescore2017(LivescoreBase):
             right_box = self._cornersToBox(right_tl, right_br)
             self._drawBox(debug_img, left_box, (255, 255, 0) if is_flipped else (255, 0, 255))
             self._drawBox(debug_img, right_box, (255, 0, 255) if is_flipped else (255, 255, 0))
-            cv2.circle(debug_img, color_point, 2, (0, 255, 0), -1)
 
-        return red_score, blue_score, is_flipped
+        return red_score, blue_score
 
     def _getFuelScores(self, img, debug_img, is_flipped):
         # Left fuel score
@@ -143,27 +160,16 @@ class Livescore2017(LivescoreBase):
 
         return red_fuel_score, red_fuel_count, blue_fuel_score, blue_fuel_count
 
-    def _getTimeRemaining(self, img, debug_img):
-        tl = self._transformPoint((605, 56))
-        br = self._transformPoint((672, 82))
-
-        time_remaining = self._parseDigits(self._getImgCropThresh(img, tl, br))
-
-        if self._debug:
-            box = self._cornersToBox(tl, br)
-            self._drawBox(debug_img, box, (0, 255, 0))
-
-        return time_remaining
-
     def _getMatchDetails(self, img):
         debug_img = None
         if self._debug:
             debug_img = img.copy()
 
         match = self._getMatchName(img, debug_img)
-        red_score, blue_score, is_flipped = self._getScores(img, debug_img)
-        red_fuel_score, red_fuel_count, blue_fuel_score, blue_fuel_count = self._getFuelScores(img, debug_img, is_flipped)
         time_remaining = self._getTimeRemaining(img, debug_img)
+        is_flipped = self._getFlipped(img, debug_img)
+        red_score, blue_score = self._getScores(img, debug_img, is_flipped)
+        red_fuel_score, red_fuel_count, blue_fuel_score, blue_fuel_count = self._getFuelScores(img, debug_img, is_flipped)
 
         if self._debug:
             cv2.imshow("ROIs", debug_img)
