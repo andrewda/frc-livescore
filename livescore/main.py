@@ -96,9 +96,10 @@ class Livescore:
         else:
             return cv2.inRange(cropped, self.BLACK_LOW, self.BLACK_HIGH)
 
-    def _parseDigits(self, img):
-        config = '--psm 8 -c tessedit_char_whitelist=1234567890 --tessdata-dir {}'.format(self.local_path.replace('\\', '/'))
-
+    def _parseDigits(self, img, use_trained_font=True):
+        config = '--psm 8 -c tessedit_char_whitelist=1234567890'
+        if use_trained_font:
+            config += ' --tessdata-dir {}'.format(self.local_path.replace('\\', '/'))
         string = pytesseract.image_to_string(
             Image.fromarray(img),
             config=config).strip()
@@ -131,16 +132,16 @@ class Livescore:
 
     def _getScores(self, img, debug_img):
         # Left score limits
-        left_tl = self._transformPoint((491, 88))
-        left_br = self._transformPoint((639, 160))
+        left_tl = self._transformPoint((496, 93))
+        left_br = self._transformPoint((634, 155))
         # Right score limits
-        right_tl = self._transformPoint((639, 88))
-        right_br = self._transformPoint((789, 160))
+        right_tl = self._transformPoint((644, 93))
+        right_br = self._transformPoint((784, 155))
         # Sample point to determine red/blue side
         color_point = self._transformPoint((496, 95))
 
-        left_score = self._parseDigits(self._getImgCropThresh(img, left_tl, left_br, white=True))
-        right_score = self._parseDigits(self._getImgCropThresh(img, right_tl, right_br, white=True))
+        left_score = self._parseDigits(self._getImgCropThresh(img, left_tl, left_br, white=True), use_trained_font=False)
+        right_score = self._parseDigits(self._getImgCropThresh(img, right_tl, right_br, white=True), use_trained_font=False)
 
         color_sample = img[color_point[1], color_point[0], :]
         is_flipped = color_sample[0] > color_sample[2]  # More blue than red
