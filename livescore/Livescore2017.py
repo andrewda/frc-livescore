@@ -185,6 +185,58 @@ class Livescore2017(LivescoreBase):
 
         return red_fuel_score, red_fuel_count, blue_fuel_score, blue_fuel_count
 
+    def _getRotors(self, img, debug_img, is_flipped):
+        left_tl = self._transformPoint((210, 123))
+        left_br = self._transformPoint((230, 148))
+        right_tl = self._transformPoint((1048, 123))
+        right_br = self._transformPoint((1068, 148))
+
+        left_rotors = self._parseDigits(self._getImgCropThresh(img, left_tl, left_br))
+        right_rotors = self._parseDigits(self._getImgCropThresh(img, right_tl, right_br))
+
+        if is_flipped:
+            red_rotors = right_rotors
+            blue_rotors = left_rotors
+        else:
+            red_rotors = left_rotors
+            blue_rotors = right_rotors
+
+        if self._debug:
+            left_color = (255, 255, 0) if is_flipped else (255, 0, 255)
+            right_color = (255, 0, 255) if is_flipped else (255, 255, 0)
+            left_box = self._cornersToBox(left_tl, left_br)
+            right_box = self._cornersToBox(right_tl, right_br)
+            self._drawBox(debug_img, left_box, left_color)
+            self._drawBox(debug_img, right_box, right_color)
+
+        return red_rotors, blue_rotors
+
+    def _getTouchpads(self, img, debug_img, is_flipped):
+        left_tl = self._transformPoint((100, 123))
+        left_br = self._transformPoint((120, 148))
+        right_tl = self._transformPoint((1158, 123))
+        right_br = self._transformPoint((1178, 148))
+
+        left_touchpads = self._parseDigits(self._getImgCropThresh(img, left_tl, left_br))
+        right_touchpads = self._parseDigits(self._getImgCropThresh(img, right_tl, right_br))
+
+        if is_flipped:
+            red_touchpads = right_touchpads
+            blue_touchpads = left_touchpads
+        else:
+            red_touchpads = left_touchpads
+            blue_touchpads = right_touchpads
+
+        if self._debug:
+            left_color = (255, 255, 0) if is_flipped else (255, 0, 255)
+            right_color = (255, 0, 255) if is_flipped else (255, 255, 0)
+            left_box = self._cornersToBox(left_tl, left_br)
+            right_box = self._cornersToBox(right_tl, right_br)
+            self._drawBox(debug_img, left_box, left_color)
+            self._drawBox(debug_img, right_box, right_color)
+
+        return red_touchpads, blue_touchpads
+
     def _getMatchDetails(self, img):
         debug_img = None
         if self._debug:
@@ -195,6 +247,8 @@ class Livescore2017(LivescoreBase):
         time_remaining, mode = self._getTimeAndMode(img, debug_img)
         red_score, blue_score = self._getScores(img, debug_img, is_flipped)
         red_fuel_score, red_fuel_count, blue_fuel_score, blue_fuel_count = self._getFuelScores(img, debug_img, is_flipped)
+        red_rotors, blue_rotors = self._getRotors(img, debug_img, is_flipped)
+        red_touchpads, blue_touchpads = self._getTouchpads(img, debug_img, is_flipped)
 
         if self._debug:
             cv2.imshow("ROIs", debug_img)
@@ -206,7 +260,20 @@ class Livescore2017(LivescoreBase):
                 match=match,
                 mode=mode,
                 time=time_remaining,
-                red=Alliance(score=red_score, fuel_score=red_fuel_score, fuel_count=red_fuel_count),
-                blue=Alliance(score=blue_score, fuel_score=blue_fuel_score, fuel_count=blue_fuel_count))
+                red=Alliance(
+                    score=red_score,
+                    fuel_score=red_fuel_score,
+                    fuel_count=red_fuel_count,
+                    rotor_count=red_rotors,
+                    touchpad_count=red_touchpads
+                ),
+                blue=Alliance(
+                    score=blue_score,
+                    fuel_score=blue_fuel_score,
+                    fuel_count=blue_fuel_count,
+                    rotor_count=blue_rotors,
+                    touchpad_count=blue_touchpads
+                )
+            )
         else:
             return None
