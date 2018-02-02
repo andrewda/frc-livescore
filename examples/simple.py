@@ -1,9 +1,9 @@
-from livescore import Livescore
+from livescore import Livescore2017
 import os
 import cv2
 
 # Initialize new Livescore instance
-frc = Livescore(debug=True)
+frc = Livescore2017(debug=True)
 
 # Read all images from the ./scenes/ directory
 for f in os.listdir('./scenes'):

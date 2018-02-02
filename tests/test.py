@@ -3,10 +3,10 @@ import sys
 import json
 import cv2
 
-from livescore import Livescore
+from livescore import Livescore2017
 
 # Initialize new Livescore instance
-frc = Livescore()
+frc = Livescore2017()
 
 error = False
 
