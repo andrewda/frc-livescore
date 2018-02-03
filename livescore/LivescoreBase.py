@@ -150,10 +150,10 @@ class LivescoreBase(object):
                 segments = segments_to_numpy([cv2.boundingRect(cnt)])
                 extractor = SimpleFeatureExtractor(feature_size=10, stretch=False)
                 features = extractor.extract(img, segments)
+                x,y,w,h = cv2.boundingRect(cnt)
 
                 if self._save_training_data:
                     # Construct clean digit image
-                    x,y,w,h = cv2.boundingRect(cnt)
                     if w > self._OCR_HEIGHT:  # Junk, or more than 1 digit
                         continue
 
@@ -173,6 +173,16 @@ class LivescoreBase(object):
                     return None
                 else:
                     # Perform classification
+                    if w > self._OCR_HEIGHT:  # More than 1 digit, fall back to Tesseract
+                        config = '--psm 8 -c tessedit_char_whitelist=1234567890'
+                        string = pytesseract.image_to_string(
+                            Image.fromarray(img[y:y+h, x:x+w]),
+                            config=config).strip()
+                        if string and string.isdigit():
+                            digits.append((string, segments[0, 0]))
+                        continue
+
+                    # Use KNN
                     digit, _, _, _ = self._knn.findNearest(features, k=3)
                     digits.append((int(digit), segments[0, 0]))
 
