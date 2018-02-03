@@ -12,25 +12,26 @@ from details import Alliance, OngoingMatchDetails
 class Livescore2017(LivescoreBase):
     def __init__(self, **kwargs):
         super(Livescore2017, self).__init__(2017, **kwargs)
+        self._match_name = None
 
     def _getMatchName(self, img, debug_img):
-        tl = self._transformPoint((155, 6))
-        br = self._transformPoint((632, 43))
+        if self._match_name is None:
+            tl = self._transformPoint((155, 6))
+            br = self._transformPoint((632, 43))
 
-        config = '--psm 7'
-        long_match = pytesseract.image_to_string(
-            Image.fromarray(self._getImgCropThresh(img, tl, br)), config=config).strip()
+            config = '--psm 7'
+            long_match = pytesseract.image_to_string(
+                Image.fromarray(self._getImgCropThresh(img, tl, br)), config=config).strip()
 
-        match = None
-        m = re.search('([a-zA-z]+) ([1-9]+)( of ...?)?', long_match)
-        if m is not None:
-            match = m.group(1) + ' ' + m.group(2)
+            m = re.search('([a-zA-z]+) ([1-9]+)( of ...?)?', long_match)
+            if m is not None:
+                self._match_name = m.group(1) + ' ' + m.group(2)
 
-        if self._debug:
-            box = self._cornersToBox(tl, br)
-            self._drawBox(debug_img, box, (0, 255, 0))
+            if self._debug:
+                box = self._cornersToBox(tl, br)
+                self._drawBox(debug_img, box, (0, 255, 0))
 
-        return match
+        return self._match_name
 
     def _getTimeAndMode(self, img, debug_img):
         # Find time remaining
@@ -242,9 +243,12 @@ class Livescore2017(LivescoreBase):
         if self._debug:
             debug_img = img.copy()
 
-        is_flipped = self._getFlipped(img, debug_img)
-        match = self._getMatchName(img, debug_img)
         time_remaining, mode = self._getTimeAndMode(img, debug_img)
+        if mode in {'pre_match', 'post_match'}:
+            self._match_name = None
+        match = self._getMatchName(img, debug_img)
+
+        is_flipped = self._getFlipped(img, debug_img)
         red_score, blue_score = self._getScores(img, debug_img, is_flipped)
         red_fuel_score, red_fuel_count, blue_fuel_score, blue_fuel_count = self._getFuelScores(img, debug_img, is_flipped)
         red_rotors, blue_rotors = self._getRotors(img, debug_img, is_flipped)
