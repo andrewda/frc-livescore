@@ -1,8 +1,12 @@
 import cv2
 import numpy as np
+import cPickle as pickle
 from PIL import Image
 import pkg_resources
 import pytesseract
+
+from simpleocr_utils.segmentation import segments_to_numpy
+from simpleocr_utils.feature_extraction import SimpleFeatureExtractor
 
 
 class NoOverlayFoundException(Exception):
@@ -10,15 +14,17 @@ class NoOverlayFoundException(Exception):
 
 
 class LivescoreBase(object):
-    def __init__(self, game_year, debug=False):
+    def __init__(self, game_year, debug=False, save_training_data=False, training_data=None):
         self._debug = debug
-        self._local_path = pkg_resources.resource_filename(__name__, 'tessdata')
+        self._save_training_data = save_training_data
 
         self._WHITE_LOW = np.array([185, 185, 185])
         self._WHITE_HIGH = np.array([255, 255, 255])
 
         self._BLACK_LOW = np.array([0, 0, 0])
         self._BLACK_HIGH = np.array([135, 135, 155])
+
+        self._OCR_HEIGHT = 64  # Do all OCR at this size
 
         self._transform = None  # scale, tx, ty
 
@@ -43,6 +49,22 @@ class LivescoreBase(object):
             np.int32(np.round(shape[0] * self._TEMPLATE_SCALE))
         ))
         self._kp1, self._des1 = self._detector.detectAndCompute(template, None)
+
+        # For saving training data
+        self._training_data = {
+            'features': np.ndarray((0, 100)),
+            'classes': np.ndarray((0, 1)),
+        }
+
+        # Train classifier
+        if training_data is None:
+            with open(pkg_resources.resource_filename(__name__, 'training_data') + '/digits.pkl', "rb") as f:
+                training_data = pickle.load(f)
+        else:
+            with open(training_data, "rb") as f:
+                training_data = pickle.load(f)
+        self._knn = cv2.ml.KNearest_create()
+        self._knn.train(training_data['features'].astype(np.float32), cv2.ml.ROW_SAMPLE, training_data['classes'].astype(np.float32))
 
     def _findScoreOverlay(self, img):
         # Finds and sets the 2d transform of the overlay in the image
@@ -89,28 +111,77 @@ class LivescoreBase(object):
         ])
 
     def _getImgCropThresh(self, img, tl, br, white=False):
-        cropped = img[tl[1]:br[1], tl[0]:br[0]]
-        height = cropped.shape[0]
-        if height < 50:
-            scale = 50.0 / height
-            cropped = cv2.resize(cropped, (int(cropped.shape[1] * scale), int(cropped.shape[0] * scale)))
+        # Crop
+        img = img[tl[1]:br[1], tl[0]:br[0]]
 
+        # Scale
+        scale = float(self._OCR_HEIGHT) / img.shape[0]
+        img = cv2.resize(img, (int(img.shape[1] * scale), int(img.shape[0] * scale)))
+
+        # Threshold
         if white:
-            return cv2.inRange(cropped, self._WHITE_LOW, self._WHITE_HIGH)
+            return cv2.inRange(img, self._WHITE_LOW, self._WHITE_HIGH)
         else:
-            return cv2.inRange(cropped, self._BLACK_LOW, self._BLACK_HIGH)
+            return cv2.inRange(img, self._BLACK_LOW, self._BLACK_HIGH)
 
     def _parseDigits(self, img, use_trained_font=True):
-        config = '--psm 8 -c tessedit_char_whitelist=1234567890'
-        if use_trained_font:
-            config += ' --tessdata-dir {}'.format(self._local_path.replace('\\', '/'))
-        string = pytesseract.image_to_string(
-            Image.fromarray(img),
-            config=config).strip()
-        if string and string.isdigit():
-            return int(string)
-        else:
+        # Crop height to digits
+        _, contours, _ = cv2.findContours(img, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        top = img.shape[1]
+        bottom = 0
+        for cnt in contours:
+            if cv2.contourArea(cnt) > 50:
+                x, y, w, h = cv2.boundingRect(cnt)
+                top = min(top, y)
+                bottom = max(bottom, y + h)
+        height = bottom - top
+        if height <= 0:
             return None
+        img = img[top:bottom, :]
+        # Scale to uniform height
+        scale = float(self._OCR_HEIGHT) / height
+        img = cv2.resize(img, (int(img.shape[1] * scale), int(img.shape[0] * scale)))
+
+        # Find bounds for each digit
+        _, contours, _ = cv2.findContours(img, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        digits = []
+        for cnt in contours:
+            if cv2.contourArea(cnt) > 850:  # Reject internal contours
+                segments = segments_to_numpy([cv2.boundingRect(cnt)])
+                extractor = SimpleFeatureExtractor(feature_size=10, stretch=False)
+                features = extractor.extract(img, segments)
+
+                if self._save_training_data:
+                    # Construct clean digit image
+                    x,y,w,h = cv2.boundingRect(cnt)
+                    if w > self._OCR_HEIGHT:  # Junk, or more than 1 digit
+                        continue
+
+                    dim = self._OCR_HEIGHT + 5
+                    digit_img = np.zeros((dim, dim), np.uint8)
+                    x2 = dim/2 - w/2
+                    y2 = dim/2 - h/2
+                    digit_img[y2:y2+h, x2:x2+w] = img[y:y+h, x:x+w]
+
+                    config = '--psm 8 -c tessedit_char_whitelist=1234567890'
+                    string = pytesseract.image_to_string(
+                        Image.fromarray(digit_img),
+                        config=config).strip()
+                    if string and string.isdigit():
+                        self._training_data['features'] = np.append(self._training_data['features'], features, axis=0)
+                        self._training_data['classes'] = np.append(self._training_data['classes'], [[int(string)]], axis=0)
+                    return None
+                else:
+                    # Perform classification
+                    digit, _, _, _ = self._knn.findNearest(features, k=3)
+                    digits.append((int(digit), segments[0, 0]))
+
+        fullNumber = ''
+        for digit, _ in sorted(digits, key=lambda x: x[1]):
+            fullNumber += str(digit)
+
+        if fullNumber != '':
+            return int(fullNumber)
 
     def _drawBox(self, img, box, color):
         cv2.polylines(img, [box], True, color, 2, cv2.LINE_AA)
@@ -127,3 +198,15 @@ class LivescoreBase(object):
             match_details = self._getMatchDetails(img)
 
         return match_details
+
+    def train(self, img):
+        img = cv2.resize(img, (1280, 720))
+
+        if self._transform is None:
+            self._findScoreOverlay(img)
+
+        self._getMatchDetails(img)
+
+    def saveTrainingData(self):
+        with open('training_data.pkl', 'wb') as output:
+            pickle.dump(self._training_data, output, pickle.HIGHEST_PROTOCOL)

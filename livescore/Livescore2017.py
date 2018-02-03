@@ -10,8 +10,8 @@ from details import Alliance, OngoingMatchDetails
 
 
 class Livescore2017(LivescoreBase):
-    def __init__(self, debug=False):
-        super(Livescore2017, self).__init__(2017, debug=debug)
+    def __init__(self, **kwargs):
+        super(Livescore2017, self).__init__(2017, **kwargs)
 
     def _getMatchName(self, img, debug_img):
         tl = self._transformPoint((155, 6))
@@ -34,8 +34,8 @@ class Livescore2017(LivescoreBase):
 
     def _getTimeAndMode(self, img, debug_img):
         # Find time remaining
-        tl = self._transformPoint((616, 53))
-        br = self._transformPoint((662, 79))
+        tl = self._transformPoint((617, 55))
+        br = self._transformPoint((667, 81))
         time_remaining = self._parseDigits(self._getImgCropThresh(img, tl, br))
 
         # Determine mode: 'pre_match', 'auto', 'teleop', or 'post_match'
