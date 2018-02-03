@@ -89,8 +89,8 @@ class Livescore2017(LivescoreBase):
         right_tl = self._transformPoint((644, 90))
         right_br = self._transformPoint((784, 152))
 
-        left_score = self._parseDigits(self._getImgCropThresh(img, left_tl, left_br, white=True), use_trained_font=False)
-        right_score = self._parseDigits(self._getImgCropThresh(img, right_tl, right_br, white=True), use_trained_font=False)
+        left_score = self._parseDigits(self._getImgCropThresh(img, left_tl, left_br, white=True))
+        right_score = self._parseDigits(self._getImgCropThresh(img, right_tl, right_br, white=True))
 
         if is_flipped:
             red_score = right_score

@@ -124,7 +124,7 @@ class LivescoreBase(object):
         else:
             return cv2.inRange(img, self._BLACK_LOW, self._BLACK_HIGH)
 
-    def _parseDigits(self, img, use_trained_font=True):
+    def _parseDigits(self, img):
         # Crop height to digits
         _, contours, _ = cv2.findContours(img, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
         top = img.shape[1]
