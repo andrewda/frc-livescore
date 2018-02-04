@@ -1,3 +1,4 @@
+import colorsys
 import cv2
 import numpy as np
 import cPickle as pickle
@@ -19,7 +20,7 @@ class LivescoreBase(object):
         self._debug = debug
         self._save_training_data = save_training_data
 
-        self._WHITE_LOW = np.array([185, 185, 185])
+        self._WHITE_LOW = np.array([120, 120, 120])
         self._WHITE_HIGH = np.array([255, 255, 255])
 
         self._BLACK_LOW = np.array([0, 0, 0])
@@ -194,6 +195,11 @@ class LivescoreBase(object):
 
         if fullNumber != '':
             return int(fullNumber)
+
+    def _checkSaturated(self, img, point):
+        bgr = img[point[1], point[0], :]
+        hsv = colorsys.rgb_to_hsv(float(bgr[2])/255, float(bgr[1])/255, float(bgr[0])/255)
+        return hsv[1] > 0.2
 
     def _drawBox(self, img, box, color):
         cv2.polylines(img, [box], True, color, 2, cv2.LINE_AA)
