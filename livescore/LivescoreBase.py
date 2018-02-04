@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import cPickle as pickle
+import logging
 from PIL import Image
 import pkg_resources
 import pytesseract
@@ -143,48 +144,49 @@ class LivescoreBase(object):
         img = cv2.resize(img, (int(img.shape[1] * scale), int(img.shape[0] * scale)))
 
         # Find bounds for each digit
-        _, contours, _ = cv2.findContours(img, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        _, contours, _ = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         digits = []
         for cnt in contours:
-            if cv2.contourArea(cnt) > 850:  # Reject internal contours
-                segments = segments_to_numpy([cv2.boundingRect(cnt)])
-                extractor = SimpleFeatureExtractor(feature_size=10, stretch=False)
-                features = extractor.extract(img, segments)
-                x,y,w,h = cv2.boundingRect(cnt)
+            segments = segments_to_numpy([cv2.boundingRect(cnt)])
+            extractor = SimpleFeatureExtractor(feature_size=10, stretch=False)
+            features = extractor.extract(img, segments)
+            x,y,w,h = cv2.boundingRect(cnt)
 
-                if self._save_training_data:
-                    # Construct clean digit image
-                    if w > self._OCR_HEIGHT:  # Junk, or more than 1 digit
-                        continue
+            if self._save_training_data:
+                # Construct clean digit image
+                if w > self._OCR_HEIGHT:  # Junk, or more than 1 digit
+                    continue
 
-                    dim = self._OCR_HEIGHT + 5
-                    digit_img = np.zeros((dim, dim), np.uint8)
-                    x2 = dim/2 - w/2
-                    y2 = dim/2 - h/2
-                    digit_img[y2:y2+h, x2:x2+w] = img[y:y+h, x:x+w]
+                dim = self._OCR_HEIGHT + 5
+                digit_img = np.zeros((dim, dim), np.uint8)
+                x2 = dim/2 - w/2
+                y2 = dim/2 - h/2
+                digit_img[y2:y2+h, x2:x2+w] = img[y:y+h, x:x+w]
 
+                config = '--psm 8 -c tessedit_char_whitelist=1234567890'
+                string = pytesseract.image_to_string(
+                    Image.fromarray(digit_img),
+                    config=config).strip()
+                if string and string.isdigit():
+                    self._training_data['features'] = np.append(self._training_data['features'], features, axis=0)
+                    self._training_data['classes'] = np.append(self._training_data['classes'], [[int(string)]], axis=0)
+                return None
+            else:
+                # Perform classification
+                if w > self._OCR_HEIGHT:  # More than 1 digit, fall back to Tesseract
+                    logging.warning("Falling back to Tesseract!")
+                    padded_img = cv2.copyMakeBorder(img[y:y+h, x:x+w], 5, 5, 5, 5, cv2.BORDER_CONSTANT, None, (0, 0, 0))
                     config = '--psm 8 -c tessedit_char_whitelist=1234567890'
                     string = pytesseract.image_to_string(
-                        Image.fromarray(digit_img),
+                        Image.fromarray(padded_img),
                         config=config).strip()
                     if string and string.isdigit():
-                        self._training_data['features'] = np.append(self._training_data['features'], features, axis=0)
-                        self._training_data['classes'] = np.append(self._training_data['classes'], [[int(string)]], axis=0)
-                    return None
-                else:
-                    # Perform classification
-                    if w > self._OCR_HEIGHT:  # More than 1 digit, fall back to Tesseract
-                        config = '--psm 8 -c tessedit_char_whitelist=1234567890'
-                        string = pytesseract.image_to_string(
-                            Image.fromarray(img[y:y+h, x:x+w]),
-                            config=config).strip()
-                        if string and string.isdigit():
-                            digits.append((string, segments[0, 0]))
-                        continue
+                        digits.append((string, segments[0, 0]))
+                    continue
 
-                    # Use KNN
-                    digit, _, _, _ = self._knn.findNearest(features, k=3)
-                    digits.append((int(digit), segments[0, 0]))
+                # Use KNN
+                digit, _, _, _ = self._knn.findNearest(features, k=3)
+                digits.append((int(digit), segments[0, 0]))
 
         fullNumber = ''
         for digit, _ in sorted(digits, key=lambda x: x[1]):
