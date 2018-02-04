@@ -6,7 +6,7 @@ import pytesseract
 import re
 
 from LivescoreBase import LivescoreBase
-from details import Alliance, OngoingMatchDetails
+from details import Alliance2017, OngoingMatchDetails
 
 
 class Livescore2017(LivescoreBase):
@@ -264,14 +264,14 @@ class Livescore2017(LivescoreBase):
                 match=match,
                 mode=mode,
                 time=time_remaining,
-                red=Alliance(
+                red=Alliance2017(
                     score=red_score,
                     fuel_score=red_fuel_score,
                     fuel_count=red_fuel_count,
                     rotor_count=red_rotors,
                     touchpad_count=red_touchpads
                 ),
-                blue=Alliance(
+                blue=Alliance2017(
                     score=blue_score,
                     fuel_score=blue_fuel_score,
                     fuel_count=blue_fuel_count,
