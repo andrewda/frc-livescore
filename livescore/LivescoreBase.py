@@ -147,7 +147,7 @@ class LivescoreBase(object):
         # Find bounds for each digit
         _, contours, _ = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         digits = []
-        for cnt in contours:
+        for cnt in filter(lambda c: cv2.contourArea(c) > 100, contours):
             segments = segments_to_numpy([cv2.boundingRect(cnt)])
             extractor = SimpleFeatureExtractor(feature_size=10, stretch=False)
             features = extractor.extract(img, segments)
