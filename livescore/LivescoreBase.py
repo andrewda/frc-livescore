@@ -45,12 +45,11 @@ class LivescoreBase(object):
         template = cv2.imread(
             pkg_resources.resource_filename(__name__, 'templates') + \
             '/score_overlay_{}.png'.format(game_year))
-        shape = template.shape
-        template = cv2.resize(template, (
-            np.int32(np.round(shape[1] * self._TEMPLATE_SCALE)),
-            np.int32(np.round(shape[0] * self._TEMPLATE_SCALE))
+        self._template = cv2.resize(template, (
+            np.int32(np.round(template.shape[1] * self._TEMPLATE_SCALE)),
+            np.int32(np.round(template.shape[0] * self._TEMPLATE_SCALE))
         ))
-        self._kp1, self._des1 = self._detector.detectAndCompute(template, None)
+        self._kp1, self._des1 = self._detector.detectAndCompute(self._template, None)
 
         # For saving training data
         self._training_data = {
@@ -69,8 +68,24 @@ class LivescoreBase(object):
         self._knn.train(training_data['features'].astype(np.float32), cv2.ml.ROW_SAMPLE, training_data['classes'].astype(np.float32))
 
     def _findScoreOverlay(self, img):
-        # Finds and sets the 2d transform of the overlay in the image
+        # Does a quick check to see if overlay moved
+        # If it has, finds and sets the 2d transform of the overlay in the image
         # Sets the transform to None if the overlay is not found
+
+        if self._transform is not None:
+            y = self._transform['ty']
+            x = self._transform['tx']
+            scale = self._transform['scale']
+            overlay = img[
+                max(0, int(y)):min(int(y+self._template.shape[0]*scale), img.shape[0] - 1),
+                max(0, int(x)):min(int(x+self._template.shape[1]*scale), img.shape[1] - 1),
+            ]
+            if overlay.shape[0] != 0 and overlay.shape[1] != 0:
+                template_img = cv2.resize(self._template, (int(overlay.shape[1]), int(overlay.shape[0])))
+                res = cv2.matchTemplate(overlay, template_img, cv2.TM_CCOEFF)
+                min_val, _, _, _ = cv2.minMaxLoc(res)
+                if min_val > 1000000000:
+                    return
 
         kp2, des2 = self._detector.detectAndCompute(img, None)
         matches = self._flann.knnMatch(self._des1, des2, k=2)
@@ -206,23 +221,12 @@ class LivescoreBase(object):
 
     def read(self, img):
         img = cv2.resize(img, (1280, 720))
-
-        if self._transform is None:
-            self._findScoreOverlay(img)
-
-        match_details = self._getMatchDetails(img)
-        if match_details is None:
-            self._findScoreOverlay(img)
-            match_details = self._getMatchDetails(img)
-
-        return match_details
+        self._findScoreOverlay(img)
+        return self._getMatchDetails(img)
 
     def train(self, img):
         img = cv2.resize(img, (1280, 720))
-
-        if self._transform is None:
-            self._findScoreOverlay(img)
-
+        self._findScoreOverlay(img)
         self._getMatchDetails(img)
 
     def saveTrainingData(self):
