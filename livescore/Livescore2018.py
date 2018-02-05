@@ -25,8 +25,8 @@ class Livescore2018(LivescoreBase):
 
     def _getMatchName(self, img, debug_img):
         if self._match_name is None:
-            tl = self._transformPoint((186, 164))
-            br = self._transformPoint((622, 196))
+            tl = self._transformPoint((159, 130))
+            br = self._transformPoint((570, 162))
 
             config = '--psm 7'
             long_match = pytesseract.image_to_string(
@@ -35,6 +35,8 @@ class Livescore2018(LivescoreBase):
             m = re.search('([a-zA-z]+) ([1-9]+)( of ...?)?', long_match)
             if m is not None:
                 self._match_name = m.group(1) + ' ' + m.group(2)
+            else:
+                self._match_name = 'Unknown Match'
 
             if self._debug:
                 box = self._cornersToBox(tl, br)
@@ -44,13 +46,13 @@ class Livescore2018(LivescoreBase):
 
     def _getTimeAndMode(self, img, debug_img):
         # Find time remaining
-        tl = self._transformPoint((617, 21))
-        br = self._transformPoint((667, 45))
+        tl = self._transformPoint((617, 14))
+        br = self._transformPoint((660, 38))
         time_remaining = self._parseDigits(self._getImgCropThresh(img, tl, br))
 
         # Determine mode: 'pre_match', 'auto', 'teleop', or 'post_match'
-        mode_point = self._transformPoint((497, 70))
-        mode_point2 = self._transformPoint((581, 70))
+        mode_point = self._transformPoint((497, 26))
+        mode_point2 = self._transformPoint((581, 26))
         mode_sample = img[mode_point[1], mode_point[0], :]
         mode_sample2 = img[mode_point2[1], mode_point2[0], :]
 
@@ -81,7 +83,7 @@ class Livescore2018(LivescoreBase):
 
     def _getFlipped(self, img, debug_img):
         # Sample point to determine red/blue side
-        color_point = self._transformPoint((518, 135))
+        color_point = self._transformPoint((496, 52))
         color_sample = img[color_point[1], color_point[0], :]
         is_flipped = color_sample[0] > color_sample[2]  # More blue than red
 
@@ -92,11 +94,11 @@ class Livescore2018(LivescoreBase):
 
     def _getScores(self, img, debug_img, is_flipped):
         # Left score limits
-        left_tl = self._transformPoint((521, 70))
-        left_br = self._transformPoint((623, 125))
+        left_tl = self._transformPoint((497, 61))
+        left_br = self._transformPoint((618, 114))
         # Right score limits
-        right_tl = self._transformPoint((670, 70))
-        right_br = self._transformPoint((772, 125))
+        right_tl = self._transformPoint((661, 61))
+        right_br = self._transformPoint((779, 114))
 
         left_score = self._parseDigits(self._getImgCropThresh(img, left_tl, left_br, white=True))
         right_score = self._parseDigits(self._getImgCropThresh(img, right_tl, right_br, white=True))
@@ -118,26 +120,26 @@ class Livescore2018(LivescoreBase):
 
     def _getVaultInfo(self, img, debug_img, is_flipped):
         # Left powerups
-        left_boost_tl = self._transformPoint((81, 107))
-        left_boost_br = self._transformPoint((100, 131))
-        left_boost_loc = self._transformPoint((39, 102))
-        left_force_tl = self._transformPoint((151, 107))
-        left_force_br = self._transformPoint((170, 131))
-        left_force_loc = self._transformPoint((211, 102))
-        left_levitate_tl = self._transformPoint((118, 78))
-        left_levitate_br = self._transformPoint((131, 100))
-        left_levitate_loc = self._transformPoint((100, 51))
+        left_boost_tl = self._transformPoint((75, 85))
+        left_boost_br = self._transformPoint((92, 106))
+        left_boost_loc = self._transformPoint((40, 84))
+        left_force_tl = self._transformPoint((145, 85))
+        left_force_br = self._transformPoint((163, 106))
+        left_force_loc = self._transformPoint((198, 84))
+        left_levitate_tl = self._transformPoint((110, 65))
+        left_levitate_br = self._transformPoint((127, 86))
+        left_levitate_loc = self._transformPoint((99, 44))
 
         # Right powerups
-        right_boost_tl = self._transformPoint((1109, 111))
-        right_boost_br = self._transformPoint((1127, 133))
-        right_boost_loc = self._transformPoint((1067, 104))
-        right_force_tl = self._transformPoint((1181, 110))
-        right_force_br = self._transformPoint((1199, 133))
-        right_force_loc = self._transformPoint((1238, 104))
-        right_levitate_tl = self._transformPoint((1145, 81))
-        right_levitate_br = self._transformPoint((1162, 103))
-        right_levitate_loc = self._transformPoint((1126, 51))
+        right_boost_tl = self._transformPoint((1279 - 163, 85))
+        right_boost_br = self._transformPoint((1279 - 145, 106))
+        right_boost_loc = self._transformPoint((1279 - 198, 84))
+        right_force_tl = self._transformPoint((1279 - 92, 85))
+        right_force_br = self._transformPoint((1279 - 75, 106))
+        right_force_loc = self._transformPoint((1279 - 40, 84))
+        right_levitate_tl = self._transformPoint((1279 - 128, 65))
+        right_levitate_br = self._transformPoint((1279 - 110, 86))
+        right_levitate_loc = self._transformPoint((1279 - 99, 44))
 
         # Counts
         left_boost_count = self._parseDigits(self._getImgCropThresh(img, left_boost_tl, left_boost_br))
@@ -213,12 +215,11 @@ class Livescore2018(LivescoreBase):
             blue_levitate_count, blue_levitate_played,
         )
 
-
     def _getSwitchScaleInfo(self, img, debug_img, is_flipped):
-        left_switch_loc = self._transformPoint((272, 91))
-        left_scale_loc = self._transformPoint((272, 67))
-        right_switch_loc = self._transformPoint((1014,  91))
-        right_scale_loc = self._transformPoint((1014, 67))
+        left_switch_loc = self._transformPoint((257, 76))
+        left_scale_loc = self._transformPoint((257, 51))
+        right_switch_loc = self._transformPoint((1279 - 257,  76))
+        right_scale_loc = self._transformPoint((1279 - 257, 51))
 
         left_switch_owned = self._checkSaturated(img, left_switch_loc)
         left_scale_owned = self._checkSaturated(img, left_scale_loc)
@@ -251,21 +252,25 @@ class Livescore2018(LivescoreBase):
 
     def _getPowerupInfo(self, img, debug_img):
         # Who owns powerup
-        color_point = self._transformPoint((644, 67))
-        powerup_played = self._checkSaturated(img, color_point)
-        if not powerup_played:
+        left_point = self._transformPoint((631, 58))
+        right_point = self._transformPoint((1279 - 631, 58))
+        left_bgr = img[left_point[1], left_point[0], :]
+        right_bgr = img[right_point[1], right_point[0], :]
+
+        if not ((left_bgr[0] > left_bgr[2] and right_bgr[0] > right_bgr[2]) or
+                (left_bgr[0] < left_bgr[2] and right_bgr[0] < right_bgr[2])):
             return None, None, None, None
-        color_sample = img[color_point[1], color_point[0], :]
-        is_red_powerup = color_sample[0] < color_sample[2]  # More red than blue
+
+        is_red_powerup = left_bgr[0] < left_bgr[2]  # More red than blue
 
         # How much time left
-        time_tl = self._transformPoint((632, 68))
-        time_br = self._transformPoint((659, 96))
+        time_tl = self._transformPoint((631, 61))
+        time_br = self._transformPoint((1279 - 631, 78))
         time = self._parseDigits(self._getImgCropThresh(img, time_tl, time_br, white=True))
 
         # Which powerup
-        powerup_tl = self._transformPoint((630, 95))
-        powerup_br = self._transformPoint((660, 125))
+        powerup_tl = self._transformPoint((630, 80))
+        powerup_br = self._transformPoint((1279 - 630, 105))
         powerup_img = img[powerup_tl[1]:powerup_br[1], powerup_tl[0]:powerup_br[0]]
 
         scale = self._transform['scale'] * self._TEMPLATE_SCALE
@@ -282,7 +287,8 @@ class Livescore2018(LivescoreBase):
         if self._debug:
             time_box = self._cornersToBox(time_tl, time_br)
             self._drawBox(debug_img, time_box, (0, 255, 0))
-            cv2.circle(debug_img, color_point, 2, (0, 255, 0), -1)
+            cv2.circle(debug_img, left_point, 2, (0, 255, 0), -1)
+            cv2.circle(debug_img, right_point, 2, (0, 255, 0), -1)
             powerup_box = self._cornersToBox(powerup_tl, powerup_br)
             self._drawBox(debug_img, powerup_box, (0, 255, 0))
 
@@ -290,6 +296,51 @@ class Livescore2018(LivescoreBase):
             return (current_powerup, None, time, None)
         else:
             return (None, current_powerup, None, time)
+
+    def _getAutoBoss(self, img, debug_img, is_flipped):
+        left_auto_loc = self._transformPoint((550, 54))
+        left_boss_loc = self._transformPoint((580, 54))
+        right_auto_loc = self._transformPoint((700, 54))
+        right_boss_loc = self._transformPoint((780, 54))
+
+        left_auto_sample = img[left_auto_loc[1], left_auto_loc[0], :]
+        left_boss_sample = img[left_boss_loc[1], left_boss_loc[0], :]
+        right_auto_sample = img[right_auto_loc[1], right_auto_loc[0], :]
+        right_boss_sample = img[right_boss_loc[1], right_boss_loc[0], :]
+
+        left_auto_hsv = colorsys.rgb_to_hsv(float(left_auto_sample[2])/255, float(left_auto_sample[1])/255, float(left_auto_sample[0])/255)
+        left_boss_hsv = colorsys.rgb_to_hsv(float(left_boss_sample[2])/255, float(left_boss_sample[1])/255, float(left_boss_sample[0])/255)
+        right_auto_hsv = colorsys.rgb_to_hsv(float(right_auto_sample[2])/255, float(right_auto_sample[1])/255, float(right_auto_sample[0])/255)
+        right_boss_hsv = colorsys.rgb_to_hsv(float(right_boss_sample[2])/255, float(right_boss_sample[1])/255, float(right_boss_sample[0])/255)
+
+        left_auto_quest = left_auto_hsv[0] > 0.116 and left_auto_hsv[0] < 0.216
+        left_face_the_boss = left_boss_hsv[0] > 0.116 and left_boss_hsv[0] < 0.216
+        right_auto_quest = right_auto_hsv[0] > 0.116 and right_auto_hsv[0] < 0.216
+        right_face_the_boss = right_boss_hsv[0] > 0.116 and right_boss_hsv[0] < 0.216
+
+        if is_flipped:
+            red_auto_quest = right_auto_quest
+            red_face_the_boss = right_face_the_boss
+            blue_auto_quest = left_auto_quest
+            blue_face_the_boss = left_face_the_boss
+        else:
+            red_auto_quest = left_auto_quest
+            red_face_the_boss = left_face_the_boss
+            blue_auto_quest = right_auto_quest
+            blue_face_the_boss = right_face_the_boss
+
+        if self._debug:
+            left_color = (255, 255, 0) if is_flipped else (255, 0, 255)
+            right_color = (255, 0, 255) if is_flipped else (255, 255, 0)
+            cv2.circle(debug_img, left_auto_loc, 2, left_color, -1)
+            cv2.circle(debug_img, left_boss_loc, 2, left_color, -1)
+            cv2.circle(debug_img, right_auto_loc, 2, right_color, -1)
+            cv2.circle(debug_img, right_boss_loc, 2, right_color, -1)
+
+        return (
+            red_auto_quest, blue_auto_quest,
+            red_face_the_boss, blue_face_the_boss,
+        )
 
     def _getMatchDetails(self, img):
         debug_img = None
@@ -319,6 +370,10 @@ class Livescore2018(LivescoreBase):
             red_current_powerup, blue_current_powerup,
             red_powerup_time_remaining, blue_powerup_time_remaining,
         ) = self._getPowerupInfo(img, debug_img)
+        (
+            red_auto_quest, blue_auto_quest,
+            red_face_the_boss, blue_face_the_boss,
+        ) = self._getAutoBoss(img, debug_img, is_flipped)
 
         if self._debug:
             cv2.imshow("ROIs", debug_img)
@@ -342,6 +397,8 @@ class Livescore2018(LivescoreBase):
                     scale_owned=red_scale_owned,
                     current_powerup=red_current_powerup,
                     powerup_time_remaining=red_powerup_time_remaining,
+                    auto_quest=red_auto_quest,
+                    face_the_boss=red_face_the_boss,
                 ),
                 blue=Alliance2018(
                     score=blue_score,
@@ -355,6 +412,8 @@ class Livescore2018(LivescoreBase):
                     scale_owned=blue_scale_owned,
                     current_powerup=blue_current_powerup,
                     powerup_time_remaining=blue_powerup_time_remaining,
+                    auto_quest=blue_auto_quest,
+                    face_the_boss=blue_face_the_boss,
                 )
             )
         else:

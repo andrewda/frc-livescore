@@ -35,6 +35,8 @@ class Alliance2018(Alliance):
             scale_owned=None,
             current_powerup=None,
             powerup_time_remaining=None,
+            auto_quest=None,
+            face_the_boss=None,
         ):
         super(Alliance2018, self).__init__(score=score, teams=teams)
         self.boost_count = boost_count
@@ -47,6 +49,8 @@ class Alliance2018(Alliance):
         self.scale_owned = scale_owned
         self.current_powerup = current_powerup
         self.powerup_time_remaining = powerup_time_remaining
+        self.auto_quest = auto_quest
+        self.face_the_boss = face_the_boss
 
 class OngoingMatchDetails(object):
     def __init__(self, match=None, mode=None, time=None, red=Alliance(), blue=Alliance()):
