@@ -301,7 +301,7 @@ class Livescore2018(LivescoreBase):
         left_auto_loc = self._transformPoint((550, 54))
         left_boss_loc = self._transformPoint((580, 54))
         right_auto_loc = self._transformPoint((700, 54))
-        right_boss_loc = self._transformPoint((780, 54))
+        right_boss_loc = self._transformPoint((730, 54))
 
         left_auto_sample = img[left_auto_loc[1], left_auto_loc[0], :]
         left_boss_sample = img[left_boss_loc[1], left_boss_loc[0], :]
