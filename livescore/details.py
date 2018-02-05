@@ -19,7 +19,6 @@ class Alliance2017(Alliance):
         self.rotor_count = rotor_count
         self.touchpad_count = touchpad_count
 
-
 class Alliance2018(Alliance):
     def __init__(
             self,
@@ -52,6 +51,23 @@ class Alliance2018(Alliance):
         self.auto_quest = auto_quest
         self.face_the_boss = face_the_boss
 
+    def getString(self, prefix):
+        return (
+            '{} score: {}\n'.format(prefix, self.score) + \
+            '{} boost_count: {}\n'.format(prefix, self.boost_count) + \
+            '{} boost_played: {}\n'.format(prefix, self.boost_played) + \
+            '{} force_count: {}\n'.format(prefix, self.force_count) + \
+            '{} force_played: {}\n'.format(prefix, self.force_played) + \
+            '{} levitate_count: {}\n'.format(prefix, self.levitate_count) + \
+            '{} levitate_played: {}\n'.format(prefix, self.levitate_played) + \
+            '{} switch_owned: {}\n'.format(prefix, self.switch_owned) + \
+            '{} scale_owned: {}\n'.format(prefix, self.scale_owned) + \
+            '{} current_powerup: {}\n'.format(prefix, self.current_powerup) + \
+            '{} powerup_time_remaining: {}\n'.format(prefix, self.powerup_time_remaining) + \
+            '{} auto_quest: {}\n'.format(prefix, self.auto_quest) + \
+            '{} face_the_boss: {}\n'.format(prefix, self.face_the_boss)
+        )
+
 class OngoingMatchDetails(object):
     def __init__(self, match=None, mode=None, time=None, red=Alliance(), blue=Alliance()):
         self.match = match
@@ -59,3 +75,8 @@ class OngoingMatchDetails(object):
         self.time = time
         self.red = red
         self.blue = blue
+
+    def __str__(self):
+
+        return 'Match: {}\nMode: {}\nTime remaining: {}\n{}{}'.format(
+            self.match, self.mode, self.time, self.red.getString('Red'), self.blue.getString('Blue'))
