@@ -54,12 +54,12 @@ class Alliance2018(Alliance):
     def getString(self, prefix):
         return (
             '{} score: {}\n'.format(prefix, self.score) + \
-            '{} boost_count: {}\n'.format(prefix, self.boost_count) + \
-            '{} boost_played: {}\n'.format(prefix, self.boost_played) + \
             '{} force_count: {}\n'.format(prefix, self.force_count) + \
             '{} force_played: {}\n'.format(prefix, self.force_played) + \
             '{} levitate_count: {}\n'.format(prefix, self.levitate_count) + \
             '{} levitate_played: {}\n'.format(prefix, self.levitate_played) + \
+            '{} boost_count: {}\n'.format(prefix, self.boost_count) + \
+            '{} boost_played: {}\n'.format(prefix, self.boost_played) + \
             '{} switch_owned: {}\n'.format(prefix, self.switch_owned) + \
             '{} scale_owned: {}\n'.format(prefix, self.scale_owned) + \
             '{} current_powerup: {}\n'.format(prefix, self.current_powerup) + \
