@@ -13,6 +13,7 @@ from details import Alliance2018, OngoingMatchDetails
 class Livescore2018(LivescoreBase):
     def __init__(self, **kwargs):
         super(Livescore2018, self).__init__(2018, **kwargs)
+        self._match_key = None
         self._match_name = None
 
         # Power up templates
@@ -23,26 +24,21 @@ class Livescore2018(LivescoreBase):
             'levitate': cv2.imread(template_path + '/2018_levitate.png'),
         }
 
-    def _getMatchName(self, img, debug_img):
-        if self._match_name is None:
+    def _getMatchKeyName(self, img, debug_img):
+        if self._match_key is None:
             tl = self._transformPoint((159, 130))
             br = self._transformPoint((570, 162))
 
             config = '--psm 7'
-            long_match = pytesseract.image_to_string(
+            raw_match_name = pytesseract.image_to_string(
                 Image.fromarray(self._getImgCropThresh(img, tl, br)), config=config).strip()
-
-            m = re.search('([a-zA-z]+) ([1-9]+)( of ...?)?', long_match)
-            if m is not None:
-                self._match_name = m.group(1) + ' ' + m.group(2)
-            else:
-                self._match_name = 'Unknown Match'
+            self._match_key = self._getMatchKey(raw_match_name)
 
             if self._debug:
                 box = self._cornersToBox(tl, br)
                 self._drawBox(debug_img, box, (0, 255, 0))
 
-        return self._match_name
+        return self._match_key, self._match_name
 
     def _getTimeAndMode(self, img, debug_img):
         # Find time remaining
@@ -350,7 +346,7 @@ class Livescore2018(LivescoreBase):
         time_remaining, mode = self._getTimeAndMode(img, debug_img)
         if mode in {'pre_match', 'post_match'}:
             self._match_name = None
-        match = self._getMatchName(img, debug_img)
+        match_key, match_name = self._getMatchKeyName(img, debug_img)
         is_flipped = self._getFlipped(img, debug_img)
         red_score, blue_score = self._getScores(img, debug_img, is_flipped)
 
@@ -379,10 +375,11 @@ class Livescore2018(LivescoreBase):
             cv2.imshow("ROIs", debug_img)
             cv2.waitKey(1)
 
-        if match is not None and red_score is not None \
+        if match_key is not None and red_score is not None \
                 and blue_score is not None and time_remaining is not None:
             return OngoingMatchDetails(
-                match=match,
+                match_key=match_key,
+                match_name=match_name,
                 mode=mode,
                 time=time_remaining,
                 red=Alliance2018(

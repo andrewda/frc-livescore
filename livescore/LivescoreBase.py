@@ -6,6 +6,7 @@ import logging
 from PIL import Image
 import pkg_resources
 import pytesseract
+import regex
 
 from simpleocr_utils.segmentation import segments_to_numpy
 from simpleocr_utils.feature_extraction import SimpleFeatureExtractor
@@ -13,6 +14,48 @@ from simpleocr_utils.feature_extraction import SimpleFeatureExtractor
 
 class NoOverlayFoundException(Exception):
     pass
+
+
+NUMBER_PATTERN = '0-9ZSO'  # Characters that might get recognized as numbers
+def num_pat(r):
+    return r.replace('@', NUMBER_PATTERN)
+
+
+# Possible formats are like:
+# Test Match
+# Practice X of Y
+# Qualification X of Y
+# Octofinal X of Y
+# Octofinal Tiebreaker X
+# Quarterfinal X of Y
+# Quarterfinal Tiebreaker X
+# Semifinal X of Y
+# Semifinal Tiebreaker X
+# Final X
+# Final Tiebreaker
+# Einstein X of Y
+# Einstein Final X
+# Einstein Final Tiebreaker
+MATCH_ID_FORMATS = [
+    (regex.compile(num_pat('(Test\s+Match){e<=3}')), 'test'),
+    (regex.compile(num_pat('(Practice){e<=3}\s+([@]+)')), 'qm'),
+    (regex.compile(num_pat('(Qualification){e<=3}\s+([@]+)')), 'qm'),
+    (regex.compile(num_pat('(Octofinal){e<=3}\s+([@]+)')), 'ef'),
+    (regex.compile(num_pat('(Octofinal\s+Tiebreaker){e<=3}\s+([@]+)')), 'ef'),
+    (regex.compile(num_pat('(Quarterfinal){e<=3}\s+([@]+)')), 'qf'),
+    (regex.compile(num_pat('(Quarterfinal\s+Tiebreaker){e<=3}\s+([@]+)')), 'qf'),
+    (regex.compile(num_pat('(Semifinal){e<=3}\s+([@]+)')), 'sf'),
+    (regex.compile(num_pat('(Semifinal\s+Tiebreaker){e<=3}\s+([@]+)')), 'sf'),
+    (regex.compile(num_pat('(Final){e<=3}\s+([@]+)')), 'f'),
+    (regex.compile(num_pat('(Final\s+Tiebreaker){e<=3}\s+([@]+)')), 'f'),
+    (regex.compile(num_pat('(Einstein){e<=3}\s+([@]+)')), 'sf'),
+    (regex.compile(num_pat('(Einstein\s+Final){e<=3}\s+([@]+)')), 'f'),
+    (regex.compile(num_pat('(Einstein\s+Final\s+Tiebreaker){e<=3}\s+([@]+)')), 'f'),
+]
+
+
+def fix_digits(text):
+    return text.replace('Z', '2').replace('S', '5').replace('O', '0')
 
 
 class LivescoreBase(object):
@@ -210,6 +253,25 @@ class LivescoreBase(object):
 
         if fullNumber != '':
             return int(fullNumber)
+
+    def _getMatchKey(self, raw_match_name):
+        for reg, comp_level in MATCH_ID_FORMATS:
+            match = reg.match(raw_match_name)
+            if match:
+                # TODO: Make API call to TBA to figure out match key
+                if comp_level == 'qm':
+                    return 'qm{}'.format(fix_digits(match.group(2)))
+                elif comp_level == 'ef':
+                    return 'ef{}'.format(fix_digits(match.group(2)))  # TODO: not correct
+                elif comp_level == 'qf':
+                    return 'qf{}'.format(fix_digits(match.group(2)))  # TODO: not correct
+                elif comp_level == 'sf':
+                    return 'sf{}'.format(fix_digits(match.group(2)))  # TODO: not correct
+                elif comp_level == 'f':
+                    return 'f1m{}'.format(fix_digits(match.group(2)))
+                else:
+                    return 'test'
+        return None
 
     def _checkSaturated(self, img, point):
         bgr = img[point[1], point[0], :]

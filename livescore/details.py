@@ -78,8 +78,9 @@ class Alliance2018(Alliance):
         )
 
 class OngoingMatchDetails(object):
-    def __init__(self, match=None, mode=None, time=None, red=Alliance(), blue=Alliance()):
-        self.match = match
+    def __init__(self, match_key=None, match_name=None, mode=None, time=None, red=Alliance(), blue=Alliance()):
+        self.match_key = match_key
+        self.match_name = match_name
         self.mode = mode
         self.time = time
         self.red = red
@@ -87,5 +88,5 @@ class OngoingMatchDetails(object):
 
     def __str__(self):
 
-        return 'Match: {}\nMode: {}\nTime remaining: {}\n{}{}'.format(
-            self.match, self.mode, self.time, self.red.getString('Red'), self.blue.getString('Blue'))
+        return 'Match Key: {}\nMatch Name: {}\nMode: {}\nTime remaining: {}\n{}{}'.format(
+            self.match_key, self.match_name, self.mode, self.time, self.red.getString('Red'), self.blue.getString('Blue'))
