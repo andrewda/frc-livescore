@@ -19,6 +19,15 @@ class Alliance2017(Alliance):
         self.rotor_count = rotor_count
         self.touchpad_count = touchpad_count
 
+    def getString(self, prefix):
+        return (
+            '{} score: {}\n'.format(prefix, self.score) + \
+            '{} fuel_score: {}\n'.format(prefix, self.fuel_score) + \
+            '{} fuel_count: {}\n'.format(prefix, self.fuel_count) + \
+            '{} rotor_count: {}\n'.format(prefix, self.rotor_count) + \
+            '{} touchpad_count: {}\n'.format(prefix, self.touchpad_count)
+        )
+
 class Alliance2018(Alliance):
     def __init__(
             self,
