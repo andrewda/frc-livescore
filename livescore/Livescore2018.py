@@ -33,6 +33,10 @@ class Livescore2018(LivescoreBase):
             raw_match_name = pytesseract.image_to_string(
                 Image.fromarray(self._getImgCropThresh(img, tl, br)), config=config).strip()
             self._match_key = self._getMatchKey(raw_match_name)
+            if self._match_key:
+                self._match_name = raw_match_name
+            else:
+                self._match_name = None
 
             if self._debug:
                 box = self._cornersToBox(tl, br)
