@@ -1,13 +1,11 @@
 import colorsys
 import cv2
-import numpy as np
 from PIL import Image
 import pkg_resources
 import pytesseract
-import re
 
-from LivescoreBase import LivescoreBase
-from details import Alliance2018, OngoingMatchDetails
+from .LivescoreBase import LivescoreBase
+from .details import Alliance2018, OngoingMatchDetails
 
 
 class Livescore2018(LivescoreBase):

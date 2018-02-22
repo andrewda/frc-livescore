@@ -1,15 +1,14 @@
 import colorsys
 import cv2
 from PIL import Image
-import pkg_resources
 import pytesseract
 
-from LivescoreBase import LivescoreBase
-from details import Alliance2017, OngoingMatchDetails
+from .LivescoreBase import LivescoreBase
+from .details import Alliance2017, OngoingMatchDetails
 
 
 class Livescore2017(LivescoreBase):
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> object:
         super(Livescore2017, self).__init__(2017, **kwargs)
         self._match_key = None
         self._match_name = None

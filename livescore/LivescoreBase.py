@@ -1,15 +1,15 @@
 import colorsys
 import cv2
 import numpy as np
-import cPickle as pickle
+import pickle
 import logging
 from PIL import Image
 import pkg_resources
 import pytesseract
 import regex
 
-from simpleocr_utils.segmentation import segments_to_numpy
-from simpleocr_utils.feature_extraction import SimpleFeatureExtractor
+from .simpleocr_utils.segmentation import segments_to_numpy
+from .simpleocr_utils.feature_extraction import SimpleFeatureExtractor
 
 
 class NoOverlayFoundException(Exception):
@@ -123,7 +123,7 @@ class LivescoreBase(object):
         # Train classifier
         if training_data is None:
             with open(pkg_resources.resource_filename(__name__, 'training_data') + '/digits.pkl', "rb") as f:
-                training_data = pickle.load(f)
+                training_data = pickle.load(f, encoding='latin1')
         else:
             with open(training_data, "rb") as f:
                 training_data = pickle.load(f)
