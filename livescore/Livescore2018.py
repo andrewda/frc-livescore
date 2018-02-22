@@ -47,7 +47,7 @@ class Livescore2018(LivescoreBase):
     def _getTimeAndMode(self, img, debug_img):
         # Find time remaining
         tl = self._transformPoint((617, 14))
-        br = self._transformPoint((660, 38))
+        br = self._transformPoint((665, 38))
         time_remaining = self._parseDigits(self._getImgCropThresh(img, tl, br))
 
         # Determine mode: 'pre_match', 'auto', 'teleop', or 'post_match'
@@ -120,10 +120,10 @@ class Livescore2018(LivescoreBase):
 
     def _getVaultInfo(self, img, debug_img, is_flipped):
         # Left powerups
-        left_force_tl = self._transformPoint((75, 85))
-        left_force_br = self._transformPoint((92, 106))
+        left_force_tl = self._transformPoint((75, 83))
+        left_force_br = self._transformPoint((93, 106))
         left_force_loc = self._transformPoint((40, 84))
-        left_boost_tl = self._transformPoint((145, 85))
+        left_boost_tl = self._transformPoint((145, 83))
         left_boost_br = self._transformPoint((163, 106))
         left_boost_loc = self._transformPoint((198, 84))
         left_levitate_tl = self._transformPoint((110, 65))
@@ -131,10 +131,10 @@ class Livescore2018(LivescoreBase):
         left_levitate_loc = self._transformPoint((99, 44))
 
         # Right powerups
-        right_force_tl = self._transformPoint((1279 - 163, 85))
+        right_force_tl = self._transformPoint((1279 - 163, 83))
         right_force_br = self._transformPoint((1279 - 145, 106))
         right_force_loc = self._transformPoint((1279 - 198, 84))
-        right_boost_tl = self._transformPoint((1279 - 92, 85))
+        right_boost_tl = self._transformPoint((1279 - 93, 83))
         right_boost_br = self._transformPoint((1279 - 75, 106))
         right_boost_loc = self._transformPoint((1279 - 40, 84))
         right_levitate_tl = self._transformPoint((1279 - 128, 65))
@@ -254,6 +254,22 @@ class Livescore2018(LivescoreBase):
         # Who owns powerup
         left_point = self._transformPoint((631, 58))
         right_point = self._transformPoint((1279 - 631, 58))
+        # Which powerup
+        powerup_tl = self._transformPoint((630, 80))
+        powerup_br = self._transformPoint((1279 - 630, 105))
+        # How much time left
+        time_tl = self._transformPoint((629, 50))
+        time_br = self._transformPoint((1279 - 629, 79))
+
+        if self._debug:
+            time_box = self._cornersToBox(time_tl, time_br)
+            self._drawBox(debug_img, time_box, (0, 255, 0))
+            cv2.circle(debug_img, left_point, 2, (0, 255, 0), -1)
+            cv2.circle(debug_img, right_point, 2, (0, 255, 0), -1)
+            powerup_box = self._cornersToBox(powerup_tl, powerup_br)
+            self._drawBox(debug_img, powerup_box, (0, 255, 0))
+
+        # Who owns powerup
         left_bgr = img[left_point[1], left_point[0], :]
         right_bgr = img[right_point[1], right_point[0], :]
 
@@ -264,13 +280,9 @@ class Livescore2018(LivescoreBase):
         is_red_powerup = left_bgr[0] < left_bgr[2]  # More red than blue
 
         # How much time left
-        time_tl = self._transformPoint((631, 61))
-        time_br = self._transformPoint((1279 - 631, 78))
         time = self._parseDigits(self._getImgCropThresh(img, time_tl, time_br, white=True))
 
         # Which powerup
-        powerup_tl = self._transformPoint((630, 80))
-        powerup_br = self._transformPoint((1279 - 630, 105))
         powerup_img = img[powerup_tl[1]:powerup_br[1], powerup_tl[0]:powerup_br[0]]
 
         scale = self._transform['scale'] * self._TEMPLATE_SCALE
@@ -283,14 +295,6 @@ class Livescore2018(LivescoreBase):
             if max_val > best_max_val:
                 best_max_val = max_val
                 current_powerup = key
-
-        if self._debug:
-            time_box = self._cornersToBox(time_tl, time_br)
-            self._drawBox(debug_img, time_box, (0, 255, 0))
-            cv2.circle(debug_img, left_point, 2, (0, 255, 0), -1)
-            cv2.circle(debug_img, right_point, 2, (0, 255, 0), -1)
-            powerup_box = self._cornersToBox(powerup_tl, powerup_br)
-            self._drawBox(debug_img, powerup_box, (0, 255, 0))
 
         if is_red_powerup:
             return (current_powerup, None, time, None)
@@ -349,7 +353,7 @@ class Livescore2018(LivescoreBase):
 
         time_remaining, mode = self._getTimeAndMode(img, debug_img)
         if mode in {'pre_match', 'post_match'}:
-            self._match_name = None
+            self._match_key = None
         match_key, match_name = self._getMatchKeyName(img, debug_img)
         is_flipped = self._getFlipped(img, debug_img)
         red_score, blue_score = self._getScores(img, debug_img, is_flipped)
