@@ -2,7 +2,7 @@ init:
 	pip install -r requirements.txt
 
 test:
-	cd tests && python test.py
+	cd tests && python test2017.py && python test2018.py
 
 flake8:
 	pip install flake8
