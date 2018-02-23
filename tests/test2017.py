@@ -1,3 +1,4 @@
+import difflib
 import os
 import sys
 import yaml
@@ -26,7 +27,10 @@ for f in os.listdir('./images/2017'):
 
     if str(data) != expected_value:
         error = True
-        print('Error processing {}\nExpected:\n{}\n\nReceived:\n{}'.format(f, expected_value, data))
+
+        d = difflib.Differ()
+        diff = '\n'.join(d.compare(expected_value.splitlines(), str(data).splitlines()))
+        print('Error Processing: {}\nDiff:\n{}'.format(f, diff))
     else:
         print('{} Passed'.format(f))
 
