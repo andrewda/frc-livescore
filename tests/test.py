@@ -32,17 +32,17 @@ for f in os.listdir('./images'):
     if data.time == expected_time and \
        data.red.score == expected_red and \
        data.blue.score == expected_blue:
-        print '{} processing success'.format(f)
+        print('{} processing success'.format(f))
     else:
-        print '{} processing error'.format(f)
-        print '\tExpected: {}'.format([expected_red,
+        print('{} processing error'.format(f))
+        print('\tExpected: {}'.format([expected_red,
                                        expected_blue,
                                        expected_time,
-                                       expected_match])
-        print '\tReceived: {}'.format([data.red.score,
+                                       expected_match]))
+        print('\tReceived: {}'.format([data.red.score,
                                        data.blue.score,
                                        data.time,
-                                       data.match])
+                                       data.match]))
         error = True
 
 if error:
