@@ -2,6 +2,7 @@ language: python
 dist: trusty
 python: 3.6.3
 cache:
+  timeout: 600
   pip: true
   directories:
     - opencv/
