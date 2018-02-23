@@ -7,6 +7,11 @@ then
     git remote add origin https://github.com/opencv/opencv.git
     git fetch origin --tags
     git checkout 3.1.0
+    cd ../opencv_contrib
+    git init
+    git remote add origin https://github.com/opencv/opencv_contrib.git
+    git fetch origin --tags
+    git checkout 3.1.0
 else
     # No OpenCV cache – clone and make the files
     echo "No cache found - cloning and making files."
