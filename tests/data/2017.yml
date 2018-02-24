@@ -1,4 +1,4 @@
-1.png: |
+01.png: |
   Match Key: qf1m2
   Match Name: Quarterfinal 5 of 8
   Mode: teleop
@@ -13,7 +13,7 @@
   Blue fuel_count: 0
   Blue rotor_count: 2
   Blue touchpad_count: 1
-2.png: |
+02.png: |
   Match Key: qm16
   Match Name: Qualification 16 of 128
   Mode: teleop
@@ -28,7 +28,7 @@
   Blue fuel_count: 6
   Blue rotor_count: 3
   Blue touchpad_count: 0
-3.png: |
+03.png: |
   Match Key: qm16
   Match Name: Qualification 16 of 128
   Mode: teleop
