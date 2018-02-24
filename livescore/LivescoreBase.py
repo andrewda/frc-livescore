@@ -130,12 +130,12 @@ class LivescoreBase(object):
         self._knn = cv2.ml.KNearest_create()
         self._knn.train(training_data['features'].astype(np.float32), cv2.ml.ROW_SAMPLE, training_data['classes'].astype(np.float32))
 
-    def _findScoreOverlay(self, img):
+    def _findScoreOverlay(self, img, force_find_overlay):
         # Does a quick check to see if overlay moved
         # If it has, finds and sets the 2d transform of the overlay in the image
         # Sets the transform to None if the overlay is not found
 
-        if self._transform is not None:
+        if self._transform is not None and not force_find_overlay:
             y = self._transform['ty']
             x = self._transform['tx']
             scale = self._transform['scale']
@@ -311,14 +311,14 @@ class LivescoreBase(object):
     def _drawBox(self, img, box, color):
         cv2.polylines(img, [box], True, color, 2, cv2.LINE_AA)
 
-    def read(self, img):
+    def read(self, img, force_find_overlay=False):
         img = cv2.resize(img, (1280, 720))
-        self._findScoreOverlay(img)
+        self._findScoreOverlay(img, force_find_overlay)
         return self._getMatchDetails(img)
 
-    def train(self, img):
+    def train(self, img, force_find_overlay=False):
         img = cv2.resize(img, (1280, 720))
-        self._findScoreOverlay(img)
+        self._findScoreOverlay(img, force_find_overlay)
         self._getMatchDetails(img)
 
     def saveTrainingData(self):

@@ -23,7 +23,7 @@ for f in os.listdir('./images/2018'):
     image = cv2.imread('./images/2018/' + f)
 
     # Get score data
-    data = frc.read(image)
+    data = frc.read(image, force_find_overlay=True)
 
     if str(data) != expected_value:
         error = True
