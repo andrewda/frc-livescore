@@ -30,9 +30,9 @@ for f in os.listdir('./images/2017'):
 
         d = difflib.Differ()
         diff = '\n'.join(d.compare(expected_value.splitlines(), str(data).splitlines()))
-        print('Error Processing: {}\nDiff:\n{}'.format(f, diff))
+        print('[2017] Error Processing: {}\nDiff:\n{}'.format(f, diff))
     else:
-        print('{} Passed'.format(f))
+        print('[2017] {} Passed'.format(f))
 
 if error:
     sys.exit(1)
