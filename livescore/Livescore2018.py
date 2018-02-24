@@ -250,14 +250,14 @@ class Livescore2018(LivescoreBase):
 
     def _getPowerupInfo(self, img, debug_img):
         # Who owns powerup
-        left_point = self._transformPoint((631, 58))
-        right_point = self._transformPoint((1279 - 631, 58))
+        left_point = self._transformPoint((631, 80))
+        right_point = self._transformPoint((1279 - 631, 80))
         # Which powerup
         powerup_tl = self._transformPoint((630, 80))
         powerup_br = self._transformPoint((1279 - 630, 105))
         # How much time left
-        time_tl = self._transformPoint((629, 50))
-        time_br = self._transformPoint((1279 - 629, 79))
+        time_tl = self._transformPoint((624, 50))
+        time_br = self._transformPoint((1279 - 624, 79))
 
         if self._debug:
             time_box = self._cornersToBox(time_tl, time_br)
@@ -344,13 +344,13 @@ class Livescore2018(LivescoreBase):
             red_face_the_boss, blue_face_the_boss,
         )
 
-    def _getMatchDetails(self, img):
+    def _getMatchDetails(self, img, force_find_overlay):
         debug_img = None
         if self._debug:
             debug_img = img.copy()
 
         time_remaining, mode = self._getTimeAndMode(img, debug_img)
-        if mode in {'pre_match', 'post_match'}:
+        if mode in {'pre_match', 'post_match'} or force_find_overlay:
             self._match_key = None
         match_key, match_name = self._getMatchKeyName(img, debug_img)
         is_flipped = self._getFlipped(img, debug_img)

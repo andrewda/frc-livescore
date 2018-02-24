@@ -238,13 +238,13 @@ class Livescore2017(LivescoreBase):
 
         return red_touchpads, blue_touchpads
 
-    def _getMatchDetails(self, img):
+    def _getMatchDetails(self, img, force_find_overlay):
         debug_img = None
         if self._debug:
             debug_img = img.copy()
 
         time_remaining, mode = self._getTimeAndMode(img, debug_img)
-        if mode in {'pre_match', 'post_match'}:
+        if mode in {'pre_match', 'post_match'} or force_find_overlay:
             self._match_key = None
         match_key, match_name = self._getMatchKeyName(img, debug_img)
 

@@ -68,7 +68,7 @@
   Red score: 163
   Red force_count: 1
   Red force_played: False
-  Red levitate_count: 5
+  Red levitate_count: 3
   Red levitate_played: True
   Red boost_count: 0
   Red boost_played: False
@@ -87,6 +87,223 @@
   Blue boost_played: False
   Blue switch_owned: False
   Blue scale_owned: True
+  Blue current_powerup: None
+  Blue powerup_time_remaining: None
+  Blue auto_quest: False
+  Blue face_the_boss: False
+4.png: |
+  Match Key: qm1
+  Match Name: Qualification 1 of 13
+  Mode: pre_match
+  Time remaining: 0
+  Red score: 0
+  Red force_count: 0
+  Red force_played: False
+  Red levitate_count: 0
+  Red levitate_played: False
+  Red boost_count: 0
+  Red boost_played: False
+  Red switch_owned: False
+  Red scale_owned: False
+  Red current_powerup: None
+  Red powerup_time_remaining: None
+  Red auto_quest: False
+  Red face_the_boss: False
+  Blue score: 0
+  Blue force_count: 0
+  Blue force_played: False
+  Blue levitate_count: 0
+  Blue levitate_played: False
+  Blue boost_count: 0
+  Blue boost_played: False
+  Blue switch_owned: False
+  Blue scale_owned: False
+  Blue current_powerup: None
+  Blue powerup_time_remaining: None
+  Blue auto_quest: False
+  Blue face_the_boss: False
+5.png: |
+  Match Key: qf1m3
+  Match Name: QuarterFinal Tiebreaker 1
+  Mode: post_match
+  Time remaining: 0
+  Red score: 180
+  Red force_count: 0
+  Red force_played: False
+  Red levitate_count: 2
+  Red levitate_played: False
+  Red boost_count: 0
+  Red boost_played: False
+  Red switch_owned: True
+  Red scale_owned: False
+  Red current_powerup: None
+  Red powerup_time_remaining: None
+  Red auto_quest: False
+  Red face_the_boss: False
+  Blue score: 105
+  Blue force_count: 0
+  Blue force_played: False
+  Blue levitate_count: 0
+  Blue levitate_played: False
+  Blue boost_count: 0
+  Blue boost_played: False
+  Blue switch_owned: False
+  Blue scale_owned: True
+  Blue current_powerup: None
+  Blue powerup_time_remaining: None
+  Blue auto_quest: False
+  Blue face_the_boss: False
+6.png: |
+  Match Key: sf2m2
+  Match Name: Semifinal 4 of 4
+  Mode: teleop
+  Time remaining: 11
+  Red score: 165
+  Red force_count: 0
+  Red force_played: False
+  Red levitate_count: 3
+  Red levitate_played: True
+  Red boost_count: 0
+  Red boost_played: False
+  Red switch_owned: True
+  Red scale_owned: False
+  Red current_powerup: None
+  Red powerup_time_remaining: None
+  Red auto_quest: False
+  Red face_the_boss: False
+  Blue score: 287
+  Blue force_count: 0
+  Blue force_played: False
+  Blue levitate_count: 3
+  Blue levitate_played: True
+  Blue boost_count: 2
+  Blue boost_played: True
+  Blue switch_owned: True
+  Blue scale_owned: True
+  Blue current_powerup: boost
+  Blue powerup_time_remaining: 0
+  Blue auto_quest: False
+  Blue face_the_boss: False
+7.png: |
+  Match Key: sf2m2
+  Match Name: Semifinal 4 of 4
+  Mode: teleop
+  Time remaining: 5
+  Red score: 175
+  Red force_count: 0
+  Red force_played: False
+  Red levitate_count: 3
+  Red levitate_played: True
+  Red boost_count: 1
+  Red boost_played: True
+  Red switch_owned: True
+  Red scale_owned: False
+  Red current_powerup: boost
+  Red powerup_time_remaining: 10
+  Red auto_quest: False
+  Red face_the_boss: False
+  Blue score: 298
+  Blue force_count: 0
+  Blue force_played: False
+  Blue levitate_count: 3
+  Blue levitate_played: True
+  Blue boost_count: 2
+  Blue boost_played: True
+  Blue switch_owned: True
+  Blue scale_owned: True
+  Blue current_powerup: None
+  Blue powerup_time_remaining: None
+  Blue auto_quest: False
+  Blue face_the_boss: False
+8.png: |
+  Match Key: qm6
+  Match Name: Qualification 6 of 13
+  Mode: post_match
+  Time remaining: 0
+  Red score: 167
+  Red force_count: 0
+  Red force_played: False
+  Red levitate_count: 0
+  Red levitate_played: False
+  Red boost_count: 0
+  Red boost_played: False
+  Red switch_owned: False
+  Red scale_owned: True
+  Red current_powerup: None
+  Red powerup_time_remaining: None
+  Red auto_quest: False
+  Red face_the_boss: False
+  Blue score: 224
+  Blue force_count: 0
+  Blue force_played: False
+  Blue levitate_count: 3
+  Blue levitate_played: True
+  Blue boost_count: 0
+  Blue boost_played: False
+  Blue switch_owned: True
+  Blue scale_owned: False
+  Blue current_powerup: None
+  Blue powerup_time_remaining: None
+  Blue auto_quest: False
+  Blue face_the_boss: False
+9.png: |
+  Match Key: f1m2
+  Match Name: Final 2
+  Mode: auto
+  Time remaining: 14
+  Red score: 0
+  Red force_count: 2
+  Red force_played: False
+  Red levitate_count: 3
+  Red levitate_played: False
+  Red boost_count: 0
+  Red boost_played: False
+  Red switch_owned: False
+  Red scale_owned: False
+  Red current_powerup: None
+  Red powerup_time_remaining: None
+  Red auto_quest: False
+  Red face_the_boss: False
+  Blue score: 0
+  Blue force_count: 0
+  Blue force_played: False
+  Blue levitate_count: 3
+  Blue levitate_played: False
+  Blue boost_count: 1
+  Blue boost_played: False
+  Blue switch_owned: False
+  Blue scale_owned: False
+  Blue current_powerup: None
+  Blue powerup_time_remaining: None
+  Blue auto_quest: False
+  Blue face_the_boss: False
+10.png: |
+  Match Key: f1m4
+  Match Name: Overtime 1
+  Mode: teleop
+  Time remaining: 31
+  Red score: 178
+  Red force_count: 0
+  Red force_played: False
+  Red levitate_count: 0
+  Red levitate_played: False
+  Red boost_count: 3
+  Red boost_played: True
+  Red switch_owned: True
+  Red scale_owned: True
+  Red current_powerup: boost
+  Red powerup_time_remaining: 5
+  Red auto_quest: False
+  Red face_the_boss: False
+  Blue score: 105
+  Blue force_count: 0
+  Blue force_played: False
+  Blue levitate_count: 0
+  Blue levitate_played: False
+  Blue boost_count: 0
+  Blue boost_played: False
+  Blue switch_owned: False
+  Blue scale_owned: False
   Blue current_powerup: None
   Blue powerup_time_remaining: None
   Blue auto_quest: False

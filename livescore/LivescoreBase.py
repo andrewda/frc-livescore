@@ -314,12 +314,12 @@ class LivescoreBase(object):
     def read(self, img, force_find_overlay=False):
         img = cv2.resize(img, (1280, 720))
         self._findScoreOverlay(img, force_find_overlay)
-        return self._getMatchDetails(img)
+        return self._getMatchDetails(img, force_find_overlay)
 
     def train(self, img, force_find_overlay=False):
         img = cv2.resize(img, (1280, 720))
         self._findScoreOverlay(img, force_find_overlay)
-        self._getMatchDetails(img)
+        self._getMatchDetails(img, force_find_overlay)
 
     def saveTrainingData(self):
         with open('training_data.pkl', 'wb') as output:
