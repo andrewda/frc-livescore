@@ -16,7 +16,6 @@ with open('data/2018.yml') as data:
 
 # Read all images from the ./images/2018 directory
 for f in os.listdir('./images/2018'):
-    # Images named in format: `red_blue_time.png`
     expected_value = values[f]
 
     # Read the image with OpenCV
