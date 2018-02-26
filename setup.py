@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='livescore',
-    version='0.0.3',
+    version='2018.0.0',
     description='Get FRC scores from an image',
     author='Andrew Dassonville',
     author_email='dassonville.andrew@gmail.com',
