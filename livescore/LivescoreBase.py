@@ -100,7 +100,7 @@ class LivescoreBase(object):
         search_params = dict(checks = 50)
         self._flann = cv2.FlannBasedMatcher(index_params, search_params)
 
-        self._MIN_MATCH_COUNT = 10
+        self._MIN_MATCH_COUNT = 9
 
         # Compute score overlay keypoints and descriptors
         self._TEMPLATE_SCALE = 0.5  # lower is faster
@@ -158,7 +158,7 @@ class LivescoreBase(object):
             if m.distance < 0.7 * n.distance:
                 good.append(m)
 
-        if len(good) > self._MIN_MATCH_COUNT:
+        if len(good) >= self._MIN_MATCH_COUNT:
             src_pts = np.float32([ self._kp1[m.queryIdx].pt for m in good ]).reshape(-1, 1, 2)
             dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good ]).reshape(-1, 1, 2)
 
