@@ -49,8 +49,8 @@ class Livescore2018(LivescoreBase):
         time_remaining = self._parseDigits(self._getImgCropThresh(img, tl, br))
 
         # Determine mode: 'pre_match', 'auto', 'teleop', or 'post_match'
-        mode_point = self._transformPoint((497, 26))
-        mode_point2 = self._transformPoint((581, 26))
+        mode_point = self._transformPoint((497, 15))
+        mode_point2 = self._transformPoint((581, 15))
         mode_sample = img[mode_point[1], mode_point[0], :]
         mode_sample2 = img[mode_point2[1], mode_point2[0], :]
 
@@ -59,6 +59,9 @@ class Livescore2018(LivescoreBase):
 
         if time_remaining is None:
             mode = None
+        elif time_remaining > 135:  # Protect against junk
+            time_remaining = 0
+
         if time_remaining == 0:
             if hsv[1] > 0.6 and hsv2[1] > 0.6:  # Both saturated
                 mode = 'post_match'
@@ -250,8 +253,8 @@ class Livescore2018(LivescoreBase):
 
     def _getPowerupInfo(self, img, debug_img):
         # Who owns powerup
-        left_point = self._transformPoint((631, 80))
-        right_point = self._transformPoint((1279 - 631, 80))
+        left_point = self._transformPoint((631, 107))
+        right_point = self._transformPoint((1279 - 631, 107))
         # Which powerup
         powerup_tl = self._transformPoint((630, 80))
         powerup_br = self._transformPoint((1279 - 630, 105))
