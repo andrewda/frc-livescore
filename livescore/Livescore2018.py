@@ -61,7 +61,6 @@ class Livescore2018(LivescoreBase):
             mode = None
         elif time_remaining > 135:  # Protect against junk
             time_remaining = 0
-            mode = None
 
         if time_remaining == 0:
             if hsv[1] > 0.6 and hsv2[1] > 0.6:  # Both saturated
