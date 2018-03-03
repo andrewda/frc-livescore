@@ -43,6 +43,16 @@ class Livescore2018(LivescoreBase):
         return self._match_key, self._match_name
 
     def _getTimeAndMode(self, img, debug_img):
+        # Check for match under review
+        review_point1 = self._transformPoint((624, 50))
+        review_sample1 = img[review_point1[1], review_point1[0], :]
+        hsvL = colorsys.rgb_to_hsv(float(review_sample1[2])/255, float(review_sample1[1])/255, float(review_sample1[0])/255)
+        review_point2 = self._transformPoint((1279 - 624, 50))
+        review_sample2 = img[review_point2[1], review_point2[0], :]
+        hsvR = colorsys.rgb_to_hsv(float(review_sample2[2])/255, float(review_sample2[1])/255, float(review_sample2[0])/255)
+        if hsvL[0] > 0.116 and hsvL[0] < 0.216 and hsvR[0] > 0.116 and hsvR[0] < 0.216:
+            return 0, 'post_match'
+
         # Find time remaining
         tl = self._transformPoint((617, 14))
         br = self._transformPoint((665, 38))
@@ -54,18 +64,16 @@ class Livescore2018(LivescoreBase):
         mode_sample = img[mode_point[1], mode_point[0], :]
         mode_sample2 = img[mode_point2[1], mode_point2[0], :]
 
-        hsv = colorsys.rgb_to_hsv(float(mode_sample[2])/255, float(mode_sample[1])/255, float(mode_sample[0])/255)
+        hsv1 = colorsys.rgb_to_hsv(float(mode_sample[2])/255, float(mode_sample[1])/255, float(mode_sample[0])/255)
         hsv2 = colorsys.rgb_to_hsv(float(mode_sample2[2])/255, float(mode_sample2[1])/255, float(mode_sample2[0])/255)
 
         if time_remaining is None:
-            mode = None
-        elif time_remaining > 135:  # Protect against junk
-            time_remaining = 0
+            return None, None
 
         if time_remaining == 0:
-            if hsv[1] > 0.6 and hsv2[1] > 0.6:  # Both saturated
+            if hsv1[1] > 0.6 and hsv2[1] > 0.6:  # Both saturated
                 mode = 'post_match'
-            elif hsv[1] > 0.6:  # First saturated
+            elif hsv1[1] > 0.6:  # First saturated
                 mode = 'auto'  # End of auton
             else:
                 mode = 'pre_match'
