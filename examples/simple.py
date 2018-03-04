@@ -15,7 +15,7 @@ for f in os.listdir('./scenes'):
 
     print('{}: Match: {}, Time: {}, Red: {}, Blue: {}, Red Fuel: {} + {}/9, Blue Fuel: {} + {}/9'.format(
         f,
-        data.match,
+        data.match_name,
         data.time,
         data.red.score,
         data.blue.score,
