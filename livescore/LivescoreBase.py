@@ -81,6 +81,7 @@ class LivescoreBase(object):
     def __init__(self, game_year, debug=False, save_training_data=False, training_data=None):
         self._debug = debug
         self._save_training_data = save_training_data
+        self._is_new_overlay = False
 
         self._WHITE_LOW = np.array([120, 120, 120])
         self._WHITE_HIGH = np.array([255, 255, 255])
@@ -147,6 +148,7 @@ class LivescoreBase(object):
                 res = cv2.matchTemplate(overlay, template_img, cv2.TM_CCOEFF)
                 min_val, _, _, _ = cv2.minMaxLoc(res)
                 if min_val > 1000000000:
+                    self._is_new_overlay = False
                     return
 
         kp2, des2 = self._detector.detectAndCompute(img, None)
@@ -169,9 +171,11 @@ class LivescoreBase(object):
                     'tx': t[0, 2],
                     'ty': t[1, 2],
                 }
+                self._is_new_overlay = True
                 return
 
         self._transform = None
+        self._is_new_overlay = False
         raise NoOverlayFoundException("Not enough matches are found - {}/{}".format(len(good), self._MIN_MATCH_COUNT))
 
     def _transformPoint(self, point):

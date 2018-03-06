@@ -361,7 +361,7 @@ class Livescore2018(LivescoreBase):
             debug_img = img.copy()
 
         time_remaining, mode = self._getTimeAndMode(img, debug_img)
-        if mode in {'pre_match', 'post_match'} or force_find_overlay:
+        if self._is_new_overlay or force_find_overlay:
             self._match_key = None
         match_key, match_name = self._getMatchKeyName(img, debug_img)
         is_flipped = self._getFlipped(img, debug_img)
