@@ -6,75 +6,14 @@ import logging
 from PIL import Image
 import pkg_resources
 import pytesseract
-import regex
 
 from .simpleocr_utils.segmentation import segments_to_numpy
 from .simpleocr_utils.feature_extraction import SimpleFeatureExtractor
+from MatchNameParser import MatchNameParser
 
 
 class NoOverlayFoundException(Exception):
     pass
-
-
-QF_BRACKET_ELIM_MAPPING = {
-    1: (1, 1),  # (set, match)
-    2: (2, 1),
-    3: (3, 1),
-    4: (4, 1),
-    5: (1, 2),
-    6: (2, 2),
-    7: (3, 2),
-    8: (4, 2),
-}
-
-SF_BRACKET_ELIM_MAPPING = {
-    1: (1, 1),  # (set, match)
-    2: (2, 1),
-    3: (1, 2),
-    4: (2, 2),
-}
-
-
-NUMBER_PATTERN = '0-9ZSO'  # Characters that might get recognized as numbers
-def num_pat(r):
-    return r.replace('@', NUMBER_PATTERN)
-
-
-# Possible formats are like:
-# Test Match
-# Practice X of Y
-# Qualification X of Y
-# Octofinal X of Y
-# Octofinal Tiebreaker X
-# Quarterfinal X of Y
-# Quarterfinal Tiebreaker X
-# Semifinal X of Y
-# Semifinal Tiebreaker X
-# Final X
-# Final Tiebreaker
-# Einstein X of Y
-# Einstein Final X
-# Einstein Final Tiebreaker
-MATCH_ID_FORMATS = [
-    (regex.compile(num_pat('(Test\s+Match){e<=3}')), 'test', False),
-    (regex.compile(num_pat('(Practice){e<=3}\s+([@]+)'), False), 'pm', False),
-    (regex.compile(num_pat('(Qualification){e<=3}\s+([@]+)'), False), 'qm', False),
-    (regex.compile(num_pat('(Octofinal){e<=3}\s+([@]+)'), False), 'ef', False),
-    (regex.compile(num_pat('(Octofinal\s+Tiebreaker){e<=3}\s+([@]+)'), False), 'ef', True),
-    (regex.compile(num_pat('(Quarterfinal){e<=3}\s+([@]+)'), False), 'qf', False),
-    (regex.compile(num_pat('(Quarterfinal\s+Tiebreaker){e<=3}\s+([@]+)'), False), 'qf', True),
-    (regex.compile(num_pat('(Semifinal){e<=3}\s+([@]+)'), False), 'sf', False),
-    (regex.compile(num_pat('(Semifinal\s+Tiebreaker){e<=3}\s+([@]+)'), False), 'sf', True),
-    (regex.compile(num_pat('(Final){e<=3}\s+([@]+)'), False), 'f', False),
-    (regex.compile(num_pat('(Overtime){e<=3}\s+([@]+)'), False), 'overtimef', False),
-    (regex.compile(num_pat('(Einstein){e<=3}\s+([@]+)'), False), 'sf', False),
-    (regex.compile(num_pat('(Einstein\s+Final){e<=3}\s+([@]+)'), False), 'f', False),
-    (regex.compile(num_pat('(Einstein\s+Final\s+Tiebreaker){e<=3}\s+([@]+)'), False), 'f', True),
-]
-
-
-def fix_digits(text):
-    return int(text.replace('Z', '2').replace('S', '5').replace('O', '0'))
 
 
 class LivescoreBase(object):
@@ -102,6 +41,8 @@ class LivescoreBase(object):
         self._flann = cv2.FlannBasedMatcher(index_params, search_params)
 
         self._MIN_MATCH_COUNT = 9
+
+        self._mnp = MatchNameParser()
 
         # Compute score overlay keypoints and descriptors
         self._TEMPLATE_SCALE = 0.5  # lower is faster
@@ -278,33 +219,7 @@ class LivescoreBase(object):
             return int(fullNumber)
 
     def _getMatchKey(self, raw_match_name):
-        for reg, comp_level, tiebreaker in MATCH_ID_FORMATS:
-            match = reg.match(raw_match_name)
-            if match:
-                # TODO: Make API call to TBA to figure out match key
-                if comp_level == 'pm':
-                    return 'pm{}'.format(fix_digits(match.group(2)))
-                elif comp_level == 'qm':
-                    return 'qm{}'.format(fix_digits(match.group(2)))
-                elif comp_level == 'ef':
-                    return 'ef{}'.format(fix_digits(match.group(2)))  # TODO: not correct
-                elif comp_level == 'qf':
-                    s, m = QF_BRACKET_ELIM_MAPPING[fix_digits(match.group(2))]
-                    if tiebreaker:
-                        m = 3
-                    return 'qf{}m{}'.format(s, m)
-                elif comp_level == 'sf':
-                    s, m = SF_BRACKET_ELIM_MAPPING[fix_digits(match.group(2))]
-                    if tiebreaker:
-                        m = 3
-                    return 'sf{}m{}'.format(s, m)
-                elif comp_level == 'f':
-                    return 'f1m{}'.format(fix_digits(match.group(2)))
-                elif comp_level == 'overtimef':
-                    return 'f1m{}'.format(3+fix_digits(match.group(2)))
-                else:
-                    return 'test'
-        return None
+        return self._mnp.get_match_key(raw_match_name)
 
     def _checkSaturated(self, img, point):
         bgr = img[point[1], point[0], :]

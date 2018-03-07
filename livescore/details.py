@@ -87,6 +87,5 @@ class OngoingMatchDetails(object):
         self.blue = blue
 
     def __str__(self):
-
-        return 'Match Key: {}\nMatch Name: {}\nMode: {}\nTime remaining: {}\n{}{}'.format(
-            self.match_key, self.match_name, self.mode, self.time, self.red.getString('Red'), self.blue.getString('Blue'))
+        return unicode(u'Match Key: {}\nMode: {}\nTime remaining: {}\n{}{}'.format(
+            self.match_key, self.mode, self.time, self.red.getString('Red'), self.blue.getString('Blue'))).encode('utf-8')
