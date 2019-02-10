@@ -2,7 +2,6 @@ import colorsys
 import cv2
 from PIL import Image
 import pkg_resources
-import pytesseract
 
 from .LivescoreBase import LivescoreBase
 from .details import Alliance2019, OngoingMatchDetails
@@ -19,9 +18,7 @@ class Livescore2019(LivescoreBase):
             tl = self._transformPoint((155, 6))
             br = self._transformPoint((570, 43))
 
-            config = '--psm 7'
-            raw_match_name = pytesseract.image_to_string(
-                Image.fromarray(self._getImgCropThresh(img, tl, br)), config=config).strip()
+            raw_match_name = self._parseRawMatchName(self._getImgCropThresh(img, tl, br))
             self._match_key = self._getMatchKey(raw_match_name)
             if self._match_key:
                 self._match_name = raw_match_name
