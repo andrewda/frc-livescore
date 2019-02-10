@@ -124,7 +124,6 @@ class Alliance2019(Alliance):
         return (
             '{} score: {}\n'.format(prefix, self.score) + \
             '{} robot1_starting_level: {}\n'.format(prefix, self.robot1_starting_level) + \
-            '{} robot1_starting_level: {}\n'.format(prefix, self.robot1_starting_level) + \
             '{} robot1_hab_line_cross: {}\n'.format(prefix, self.robot1_hab_line_cross) + \
             '{} robot1_ending_level: {}\n'.format(prefix, self.robot1_ending_level) + \
             '{} robot2_starting_level: {}\n'.format(prefix, self.robot2_starting_level) + \

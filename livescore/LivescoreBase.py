@@ -320,6 +320,19 @@ class LivescoreBase(object):
         hsv = colorsys.rgb_to_hsv(float(bgr[2])/255, float(bgr[1])/255, float(bgr[0])/255)
         return hsv[1] > 0.2
 
+    def _matchTemplate(self, img, templates):
+        scale = self._transform['scale'] * self._TEMPLATE_SCALE
+        best_max_val = 0
+        matched_key = None
+        for key, template_img in templates.items():
+            template_img = cv2.resize(template_img, (int(np.round(template_img.shape[1]*scale)), int(np.round(template_img.shape[0]*scale))))
+            res = cv2.matchTemplate(img, template_img, cv2.TM_CCOEFF)
+            _, max_val, _, _ = cv2.minMaxLoc(res)
+            if max_val > best_max_val:
+                best_max_val = max_val
+                matched_key = key
+        return matched_key
+
     def _drawBox(self, img, box, color):
         cv2.polylines(img, [box], True, color, 2, cv2.LINE_AA)
 

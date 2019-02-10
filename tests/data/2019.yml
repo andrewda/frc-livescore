@@ -6,13 +6,13 @@
   Red score: 418
   Red robot1_starting_level: 1
   Red robot1_hab_line_cross: S
-  Red robot1_ending_level: -
+  Red robot1_ending_level: None
   Red robot2_starting_level: 2
-  Red robot2_hab_line_cross: -
-  Red robot2_ending_level: -
+  Red robot2_hab_line_cross: None
+  Red robot2_ending_level: None
   Red robot3_starting_level: 2
   Red robot3_hab_line_cross: T
-  Red robot3_ending_level: -
+  Red robot3_ending_level: None
   Red cargo_ship_hatch_count: 4
   Red cargo_ship_cargo_count: 4
   Red rocket1_hatch_count: 3
@@ -24,10 +24,10 @@
   Blue score: 166
   Blue robot1_starting_level: 2
   Blue robot1_hab_line_cross: T
-  Blue robot1_ending_level: -
+  Blue robot1_ending_level: None
   Blue robot2_starting_level: 2
-  Blue robot2_hab_line_cross: -
-  Blue robot2_ending_level: -
+  Blue robot2_hab_line_cross: None
+  Blue robot2_ending_level: None
   Blue robot3_starting_level: 1
   Blue robot3_hab_line_cross: S
   Blue robot3_ending_level: 1
