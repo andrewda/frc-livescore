@@ -4,21 +4,21 @@
   Mode: pre_match
   Time remaining: 0
   Red score: 418
-  Red robot1_starting_level: 1
+  Red robot1_starting_level: None
   Red robot1_hab_line_cross: S
-  Red robot1_ending_level: None
-  Red robot2_starting_level: 2
+  Red robot1_ending_level: 1
+  Red robot2_starting_level: None
   Red robot2_hab_line_cross: None
-  Red robot2_ending_level: None
-  Red robot3_starting_level: 2
+  Red robot2_ending_level: 2
+  Red robot3_starting_level: None
   Red robot3_hab_line_cross: T
-  Red robot3_ending_level: None
+  Red robot3_ending_level: 2
   Red cargo_ship_hatch_count: 4
   Red cargo_ship_cargo_count: 4
-  Red rocket1_hatch_count: 3
-  Red rocket1_cargo_count: 3
-  Red rocket2_hatch_count: 2
-  Red rocket2_cargo_count: 2
+  Red rocket1_hatch_count: 2
+  Red rocket1_cargo_count: 2
+  Red rocket2_hatch_count: 3
+  Red rocket2_cargo_count: 3
   Red rocket_rp: True
   Red hab_rp: True
   Blue score: 166
@@ -33,9 +33,173 @@
   Blue robot3_ending_level: 1
   Blue cargo_ship_hatch_count: 4
   Blue cargo_ship_cargo_count: 4
-  Blue rocket1_hatch_count: 3
-  Blue rocket1_cargo_count: 3
-  Blue rocket2_hatch_count: 2
-  Blue rocket2_cargo_count: 2
+  Blue rocket1_hatch_count: 2
+  Blue rocket1_cargo_count: 2
+  Blue rocket2_hatch_count: 3
+  Blue rocket2_cargo_count: 3
   Blue rocket_rp: True
   Blue hab_rp: True
+02.png: |
+  Match Key: sf2m2
+  Match Name: Semifinal 4 of 4
+  Mode: auto
+  Time remaining: 5
+  Red score: 12
+  Red robot1_starting_level: 1
+  Red robot1_hab_line_cross: S
+  Red robot1_ending_level: None
+  Red robot2_starting_level: 1
+  Red robot2_hab_line_cross: S
+  Red robot2_ending_level: None
+  Red robot3_starting_level: 2
+  Red robot3_hab_line_cross: S
+  Red robot3_ending_level: None
+  Red cargo_ship_hatch_count: 0
+  Red cargo_ship_cargo_count: 0
+  Red rocket1_hatch_count: 0
+  Red rocket1_cargo_count: 0
+  Red rocket2_hatch_count: 0
+  Red rocket2_cargo_count: 0
+  Red rocket_rp: False
+  Red hab_rp: False
+  Blue score: 9
+  Blue robot1_starting_level: 2
+  Blue robot1_hab_line_cross: None
+  Blue robot1_ending_level: None
+  Blue robot2_starting_level: 1
+  Blue robot2_hab_line_cross: S
+  Blue robot2_ending_level: None
+  Blue robot3_starting_level: 2
+  Blue robot3_hab_line_cross: S
+  Blue robot3_ending_level: None
+  Blue cargo_ship_hatch_count: 0
+  Blue cargo_ship_cargo_count: 0
+  Blue rocket1_hatch_count: 0
+  Blue rocket1_cargo_count: 0
+  Blue rocket2_hatch_count: 0
+  Blue rocket2_cargo_count: 0
+  Blue rocket_rp: False
+  Blue hab_rp: False
+03.png: |
+  Match Key: sf2m2
+  Match Name: Semifinal 4 of 4
+  Mode: teleop
+  Time remaining: 133
+  Red score: 14
+  Red robot1_starting_level: 1
+  Red robot1_hab_line_cross: S
+  Red robot1_ending_level: None
+  Red robot2_starting_level: 1
+  Red robot2_hab_line_cross: S
+  Red robot2_ending_level: None
+  Red robot3_starting_level: 2
+  Red robot3_hab_line_cross: S
+  Red robot3_ending_level: None
+  Red cargo_ship_hatch_count: 1
+  Red cargo_ship_cargo_count: 0
+  Red rocket1_hatch_count: 0
+  Red rocket1_cargo_count: 0
+  Red rocket2_hatch_count: 0
+  Red rocket2_cargo_count: 0
+  Red rocket_rp: False
+  Red hab_rp: False
+  Blue score: 15
+  Blue robot1_starting_level: 2
+  Blue robot1_hab_line_cross: S
+  Blue robot1_ending_level: None
+  Blue robot2_starting_level: 1
+  Blue robot2_hab_line_cross: S
+  Blue robot2_ending_level: None
+  Blue robot3_starting_level: 2
+  Blue robot3_hab_line_cross: S
+  Blue robot3_ending_level: None
+  Blue cargo_ship_hatch_count: 0
+  Blue cargo_ship_cargo_count: 0
+  Blue rocket1_hatch_count: 0
+  Blue rocket1_cargo_count: 0
+  Blue rocket2_hatch_count: 0
+  Blue rocket2_cargo_count: 0
+  Blue rocket_rp: False
+  Blue hab_rp: False
+04.png: |
+  Match Key: sf2m2
+  Match Name: Semifinal 4 of 4
+  Mode: teleop
+  Time remaining: 8
+  Red score: 47
+  Red robot1_starting_level: 1
+  Red robot1_hab_line_cross: S
+  Red robot1_ending_level: None
+  Red robot2_starting_level: 1
+  Red robot2_hab_line_cross: S
+  Red robot2_ending_level: 3
+  Red robot3_starting_level: 2
+  Red robot3_hab_line_cross: S
+  Red robot3_ending_level: 1
+  Red cargo_ship_hatch_count: 1
+  Red cargo_ship_cargo_count: 6
+  Red rocket1_hatch_count: 0
+  Red rocket1_cargo_count: 0
+  Red rocket2_hatch_count: 0
+  Red rocket2_cargo_count: 0
+  Red rocket_rp: False
+  Red hab_rp: False
+  Blue score: 34
+  Blue robot1_starting_level: 2
+  Blue robot1_hab_line_cross: S
+  Blue robot1_ending_level: None
+  Blue robot2_starting_level: 1
+  Blue robot2_hab_line_cross: S
+  Blue robot2_ending_level: None
+  Blue robot3_starting_level: 2
+  Blue robot3_hab_line_cross: S
+  Blue robot3_ending_level: None
+  Blue cargo_ship_hatch_count: 2
+  Blue cargo_ship_cargo_count: 1
+  Blue rocket1_hatch_count: 4
+  Blue rocket1_cargo_count: 0
+  Blue rocket2_hatch_count: 2
+  Blue rocket2_cargo_count: 0
+  Blue rocket_rp: False
+  Blue hab_rp: False
+05.png: |
+  Match Key: qf4m1
+  Match Name: Quarterfinal 4 of 8
+  Mode: post_match
+  Time remaining: 0
+  Red score: 45
+  Red robot1_starting_level: 2
+  Red robot1_hab_line_cross: S
+  Red robot1_ending_level: None
+  Red robot2_starting_level: 1
+  Red robot2_hab_line_cross: S
+  Red robot2_ending_level: 1
+  Red robot3_starting_level: 2
+  Red robot3_hab_line_cross: S
+  Red robot3_ending_level: 1
+  Red cargo_ship_hatch_count: 2
+  Red cargo_ship_cargo_count: 4
+  Red rocket1_hatch_count: 1
+  Red rocket1_cargo_count: 0
+  Red rocket2_hatch_count: 3
+  Red rocket2_cargo_count: 0
+  Red rocket_rp: False
+  Red hab_rp: False
+  Blue score: 25
+  Blue robot1_starting_level: 1
+  Blue robot1_hab_line_cross: S
+  Blue robot1_ending_level: None
+  Blue robot2_starting_level: 1
+  Blue robot2_hab_line_cross: S
+  Blue robot2_ending_level: None
+  Blue robot3_starting_level: 1
+  Blue robot3_hab_line_cross: S
+  Blue robot3_ending_level: None
+  Blue cargo_ship_hatch_count: 2
+  Blue cargo_ship_cargo_count: 2
+  Blue rocket1_hatch_count: 0
+  Blue rocket1_cargo_count: 0
+  Blue rocket2_hatch_count: 3
+  Blue rocket2_cargo_count: 0
+  Blue rocket_rp: False
+  Blue hab_rp: False
