@@ -80,7 +80,7 @@ def fix_digits(text):
 
 
 class LivescoreBase(object):
-    def __init__(self, game_year, debug=False, save_training_data=False, training_data=None):
+    def __init__(self, game_year, debug=False, save_training_data=False, append_training_data=True):
         self._debug = debug
         self._save_training_data = save_training_data
         self._is_new_overlay = False
@@ -125,14 +125,13 @@ class LivescoreBase(object):
         }
 
         # Train classifier
-        if training_data is None:
-            with open(pkg_resources.resource_filename(__name__, 'training_data') + '/digits.pkl', "rb") as f:
-                training_data = pickle.load(f, encoding='latin1')
-        else:
-            with open(training_data, "rb") as f:
-                training_data = pickle.load(f)
+        self._training_data_file = pkg_resources.resource_filename(__name__, 'training_data') + '/digits.pkl'
+        if append_training_data:
+            with open(self._training_data_file, "rb") as f:
+                self._training_data = pickle.load(f, encoding='latin1')
+
         self._knn = cv2.ml.KNearest_create()
-        self._knn.train(training_data['features'].astype(np.float32), cv2.ml.ROW_SAMPLE, training_data['classes'].astype(np.float32))
+        self._knn.train(self._training_data['features'].astype(np.float32), cv2.ml.ROW_SAMPLE, self._training_data['classes'].astype(np.float32))
 
     def _findScoreOverlay(self, img, force_find_overlay):
         # Does a quick check to see if overlay moved
@@ -248,9 +247,9 @@ class LivescoreBase(object):
                     continue
 
                 dim = self._OCR_HEIGHT + 5
-                digit_img = np.zeros((dim, dim), np.uint8)
-                x2 = dim/2 - w/2
-                y2 = dim/2 - h/2
+                digit_img = np.ones((dim, dim), np.uint8) * 255
+                x2 = int(dim/2 - w/2)
+                y2 = int(dim/2 - h/2)
                 digit_img[y2:y2+h, x2:x2+w] = 255 - img[y:y+h, x:x+w]
 
                 config = '--oem 1 --psm 8 --tessdata-dir {} -l digits'.format(TESSDATA_DIR.replace('\\', '/'))
@@ -260,6 +259,10 @@ class LivescoreBase(object):
                 if string and string.isdigit():
                     self._training_data['features'] = np.append(self._training_data['features'], features, axis=0)
                     self._training_data['classes'] = np.append(self._training_data['classes'], [[int(string)]], axis=0)
+
+                    # Update saved training data
+                    with open(self._training_data_file, "wb") as f:
+                        pickle.dump(self._training_data, f)
                 return None
             else:
                 # Perform classification
