@@ -13,20 +13,6 @@ class Livescore2019(LivescoreBase):
         self._match_key = None
         self._match_name = None
 
-        template_path = pkg_resources.resource_filename(__name__, 'templates')
-        dash = cv2.imread(template_path + '/2019_dash.png')
-        self._hab_level_templates = {
-            None: dash,
-            1: cv2.imread(template_path + '/2019_1.png'),
-            2: cv2.imread(template_path + '/2019_2.png'),
-            3: cv2.imread(template_path + '/2019_3.png'),
-        }
-        self._hab_cross_templates = {
-            None: dash,
-            'S': cv2.imread(template_path + '/2019_s.png'),
-            'T': cv2.imread(template_path + '/2019_t.png'),
-        }
-
     def _getMatchKeyName(self, img, debug_img):
         if self._match_key is None:
             tl = self._transformPoint((155, 6))
@@ -134,36 +120,36 @@ class Livescore2019(LivescoreBase):
 
     def _getHatchCargoCounts(self, img, debug_img, is_flipped):
         # Left
-        left_cargo_ship_hatch_count_tl = self._transformPoint((230, 127))
-        left_cargo_ship_hatch_count_br = self._transformPoint((247, 148))
-        left_cargo_ship_cargo_count_tl = self._transformPoint((230, 67))
-        left_cargo_ship_cargo_count_br = self._transformPoint((247, 88))
+        left_cargo_ship_hatch_count_tl = self._transformPoint((359, 114))
+        left_cargo_ship_hatch_count_br = self._transformPoint((387, 151))
+        left_cargo_ship_cargo_count_tl = self._transformPoint((359, 63))
+        left_cargo_ship_cargo_count_br = self._transformPoint((387, 100))
 
-        left_rocket1_hatch_count_tl = self._transformPoint((166, 127))
-        left_rocket1_hatch_count_br = self._transformPoint((183, 148))
-        left_rocket1_cargo_count_tl = self._transformPoint((166, 67))
-        left_rocket1_cargo_count_br = self._transformPoint((183, 88))
+        left_rocket1_hatch_count_tl = self._transformPoint((165, 114))
+        left_rocket1_hatch_count_br = self._transformPoint((190, 151))
+        left_rocket1_cargo_count_tl = self._transformPoint((165, 63))
+        left_rocket1_cargo_count_br = self._transformPoint((190, 100))
 
-        left_rocket2_hatch_count_tl = self._transformPoint((86, 127))
-        left_rocket2_hatch_count_br = self._transformPoint((103, 148))
-        left_rocket2_cargo_count_tl = self._transformPoint((86, 67))
-        left_rocket2_cargo_count_br = self._transformPoint((103, 88))
+        left_rocket2_hatch_count_tl = self._transformPoint((61, 114))
+        left_rocket2_hatch_count_br = self._transformPoint((86, 151))
+        left_rocket2_cargo_count_tl = self._transformPoint((61, 63))
+        left_rocket2_cargo_count_br = self._transformPoint((86, 100))
 
         # Right
-        right_cargo_ship_hatch_count_tl = self._transformPoint((1279 - 247, 127))
-        right_cargo_ship_hatch_count_br = self._transformPoint((1279 - 230, 148))
-        right_cargo_ship_cargo_count_tl = self._transformPoint((1279 - 247, 67))
-        right_cargo_ship_cargo_count_br = self._transformPoint((1279 - 230, 88))
+        right_cargo_ship_hatch_count_tl = self._transformPoint((1279 - 387, 114))
+        right_cargo_ship_hatch_count_br = self._transformPoint((1279 - 359, 151))
+        right_cargo_ship_cargo_count_tl = self._transformPoint((1279 - 387, 63))
+        right_cargo_ship_cargo_count_br = self._transformPoint((1279 - 359, 100))
 
-        right_rocket1_hatch_count_tl = self._transformPoint((1279 - 183, 127))
-        right_rocket1_hatch_count_br = self._transformPoint((1279 - 166, 148))
-        right_rocket1_cargo_count_tl = self._transformPoint((1279 - 183, 67))
-        right_rocket1_cargo_count_br = self._transformPoint((1279 - 166, 88))
+        right_rocket1_hatch_count_tl = self._transformPoint((1279 - 190, 114))
+        right_rocket1_hatch_count_br = self._transformPoint((1279 - 165, 151))
+        right_rocket1_cargo_count_tl = self._transformPoint((1279 - 190, 63))
+        right_rocket1_cargo_count_br = self._transformPoint((1279 - 165, 100))
 
-        right_rocket2_hatch_count_tl = self._transformPoint((1279 - 103, 127))
-        right_rocket2_hatch_count_br = self._transformPoint((1279 - 86, 148))
-        right_rocket2_cargo_count_tl = self._transformPoint((1279 - 103, 67))
-        right_rocket2_cargo_count_br = self._transformPoint((1279 - 86, 88))
+        right_rocket2_hatch_count_tl = self._transformPoint((1279 - 86, 114))
+        right_rocket2_hatch_count_br = self._transformPoint((1279 - 61, 151))
+        right_rocket2_cargo_count_tl = self._transformPoint((1279 - 86, 63))
+        right_rocket2_cargo_count_br = self._transformPoint((1279 - 61, 100))
 
         # Counts
         left_cargo_ship_hatch_count = self._parseDigits(self._getImgCropThresh(img, left_cargo_ship_hatch_count_tl, left_cargo_ship_hatch_count_br))
@@ -300,91 +286,6 @@ class Livescore2019(LivescoreBase):
             red_habRP, blue_habRP,
         )
 
-    def _getHabInfo(self, img, debug_img, is_flipped):
-        # Left start
-        left_start_levels = []
-        for i in range(3):
-            tl = self._transformPoint((348, 84 + 25*i))
-            br = self._transformPoint((372, 102 + 25*i))
-            left_start_levels.append(self._matchTemplate(img[tl[1]:br[1], tl[0]:br[0]], self._hab_level_templates))
-            if self._debug:
-                left_robot_start_box = self._cornersToBox(tl, br)
-                self._drawBox(debug_img, left_robot_start_box, (255, 255, 0) if is_flipped else (255, 0, 255))
-
-        # Left hab crosses
-        left_hab_crosses = []
-        for i in range(3):
-            tl = self._transformPoint((378, 84 + 25*i))
-            br = self._transformPoint((402, 102 + 25*i))
-            left_hab_crosses.append(self._matchTemplate(img[tl[1]:br[1], tl[0]:br[0]], self._hab_cross_templates))
-            if self._debug:
-                left_robot_start_box = self._cornersToBox(tl, br)
-                self._drawBox(debug_img, left_robot_start_box, (255, 255, 0) if is_flipped else (255, 0, 255))
-
-        # Left hab end
-        left_end_levels = []
-        for i in range(3):
-            tl = self._transformPoint((408, 84 + 25*i))
-            br = self._transformPoint((432, 102 + 25*i))
-            left_end_levels.append(self._matchTemplate(img[tl[1]:br[1], tl[0]:br[0]], self._hab_level_templates))
-            if self._debug:
-                left_robot_start_box = self._cornersToBox(tl, br)
-                self._drawBox(debug_img, left_robot_start_box, (255, 255, 0) if is_flipped else (255, 0, 255))
-
-        # Right start
-        right_start_levels = []
-        for i in range(3):
-            tl = self._transformPoint((1279 - 432, 84 + 25*i))
-            br = self._transformPoint((1279 - 408, 102 + 25*i))
-            right_start_levels.append(self._matchTemplate(img[tl[1]:br[1], tl[0]:br[0]], self._hab_level_templates))
-            if self._debug:
-                right_robot_start_box = self._cornersToBox(tl, br)
-                self._drawBox(debug_img, right_robot_start_box, (255, 255, 0) if is_flipped else (255, 0, 255))
-
-        # Right hab crosses
-        right_hab_crosses = []
-        for i in range(3):
-            tl = self._transformPoint((1279 - 402, 84 + 25*i))
-            br = self._transformPoint((1279 - 378, 102 + 25*i))
-            right_hab_crosses.append(self._matchTemplate(img[tl[1]:br[1], tl[0]:br[0]], self._hab_cross_templates))
-            if self._debug:
-                right_robot_start_box = self._cornersToBox(tl, br)
-                self._drawBox(debug_img, right_robot_start_box, (255, 255, 0) if is_flipped else (255, 0, 255))
-
-        # Right hab end
-        right_end_levels = []
-        for i in range(3):
-            tl = self._transformPoint((1279 - 372, 84 + 25*i))
-            br = self._transformPoint((1279 - 348, 102 + 25*i))
-            right_end_levels.append(self._matchTemplate(img[tl[1]:br[1], tl[0]:br[0]], self._hab_level_templates))
-            if self._debug:
-                right_robot_start_box = self._cornersToBox(tl, br)
-                self._drawBox(debug_img, right_robot_start_box, (255, 255, 0) if is_flipped else (255, 0, 255))
-
-        if is_flipped:
-            red_start_levels = right_start_levels
-            red_hab_crosses = right_hab_crosses
-            red_end_levels = right_end_levels
-            blue_start_levels = left_start_levels
-            blue_hab_crosses = left_hab_crosses
-            blue_end_levels = left_end_levels
-        else:
-            red_start_levels = left_start_levels
-            red_hab_crosses = left_hab_crosses
-            red_end_levels = left_end_levels
-            blue_start_levels = right_start_levels
-            blue_hab_crosses = right_hab_crosses
-            blue_end_levels = right_end_levels
-
-        return (
-            red_start_levels,
-            red_hab_crosses,
-            red_end_levels,
-            blue_start_levels,
-            blue_hab_crosses,
-            blue_end_levels,
-        )
-
     def _getMatchDetails(self, img, force_find_overlay):
         debug_img = None
         if self._debug:
@@ -410,15 +311,6 @@ class Livescore2019(LivescoreBase):
             red_habRP, blue_habRP,
         ) = self._getRP(img, debug_img, is_flipped)
 
-        (
-            red_start_levels,
-            red_hab_crosses,
-            red_end_levels,
-            blue_start_levels,
-            blue_hab_crosses,
-            blue_end_levels,
-        ) = self._getHabInfo(img, debug_img, is_flipped)
-
         if self._debug:
             cv2.imshow("ROIs", debug_img)
             cv2.waitKey(1)
@@ -432,15 +324,6 @@ class Livescore2019(LivescoreBase):
                 time=time_remaining,
                 red=Alliance2019(
                     score=red_score,
-                    robot1_starting_level=red_start_levels[0],
-                    robot2_starting_level=red_start_levels[1],
-                    robot3_starting_level=red_start_levels[2],
-                    robot1_hab_line_cross=red_hab_crosses[0],
-                    robot2_hab_line_cross=red_hab_crosses[1],
-                    robot3_hab_line_cross=red_hab_crosses[2],
-                    robot1_ending_level=red_end_levels[0],
-                    robot2_ending_level=red_end_levels[1],
-                    robot3_ending_level=red_end_levels[2],
                     cargo_ship_hatch_count=red_cargo_ship_hatch_count,
                     cargo_ship_cargo_count=red_cargo_ship_cargo_count,
                     rocket1_hatch_count=red_rocket1_hatch_count,
@@ -452,15 +335,6 @@ class Livescore2019(LivescoreBase):
                 ),
                 blue=Alliance2019(
                     score=blue_score,
-                    robot1_starting_level=blue_start_levels[0],
-                    robot2_starting_level=blue_start_levels[1],
-                    robot3_starting_level=blue_start_levels[2],
-                    robot1_hab_line_cross=blue_hab_crosses[0],
-                    robot2_hab_line_cross=blue_hab_crosses[1],
-                    robot3_hab_line_cross=blue_hab_crosses[2],
-                    robot1_ending_level=blue_end_levels[0],
-                    robot2_ending_level=blue_end_levels[1],
-                    robot3_ending_level=blue_end_levels[2],
                     cargo_ship_hatch_count=blue_cargo_ship_hatch_count,
                     cargo_ship_cargo_count=blue_cargo_ship_cargo_count,
                     rocket1_hatch_count=blue_rocket1_hatch_count,

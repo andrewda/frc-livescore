@@ -123,15 +123,6 @@ class Alliance2019(Alliance):
     def getString(self, prefix):
         return (
             '{} score: {}\n'.format(prefix, self.score) + \
-            '{} robot1_starting_level: {}\n'.format(prefix, self.robot1_starting_level) + \
-            '{} robot1_hab_line_cross: {}\n'.format(prefix, self.robot1_hab_line_cross) + \
-            '{} robot1_ending_level: {}\n'.format(prefix, self.robot1_ending_level) + \
-            '{} robot2_starting_level: {}\n'.format(prefix, self.robot2_starting_level) + \
-            '{} robot2_hab_line_cross: {}\n'.format(prefix, self.robot2_hab_line_cross) + \
-            '{} robot2_ending_level: {}\n'.format(prefix, self.robot2_ending_level) + \
-            '{} robot3_starting_level: {}\n'.format(prefix, self.robot3_starting_level) + \
-            '{} robot3_hab_line_cross: {}\n'.format(prefix, self.robot3_hab_line_cross) + \
-            '{} robot3_ending_level: {}\n'.format(prefix, self.robot3_ending_level) + \
             '{} cargo_ship_hatch_count: {}\n'.format(prefix, self.cargo_ship_hatch_count) + \
             '{} cargo_ship_cargo_count: {}\n'.format(prefix, self.cargo_ship_cargo_count) + \
             '{} rocket1_hatch_count: {}\n'.format(prefix, self.rocket1_hatch_count) + \
