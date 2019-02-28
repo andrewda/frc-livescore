@@ -2,7 +2,6 @@ import colorsys
 import cv2
 from PIL import Image
 import pkg_resources
-import pytesseract
 
 from .LivescoreBase import LivescoreBase
 from .details import Alliance2018, OngoingMatchDetails
@@ -27,9 +26,7 @@ class Livescore2018(LivescoreBase):
             tl = self._transformPoint((159, 130))
             br = self._transformPoint((570, 162))
 
-            config = '--psm 7'
-            raw_match_name = pytesseract.image_to_string(
-                Image.fromarray(self._getImgCropThresh(img, tl, br)), config=config).strip()
+            raw_match_name = self._parseRawMatchName(self._getImgCropThresh(img, tl, br))
             self._match_key = self._getMatchKey(raw_match_name)
             if self._match_key:
                 self._match_name = raw_match_name
@@ -293,17 +290,7 @@ class Livescore2018(LivescoreBase):
 
         # Which powerup
         powerup_img = img[powerup_tl[1]:powerup_br[1], powerup_tl[0]:powerup_br[0]]
-
-        scale = self._transform['scale'] * self._TEMPLATE_SCALE
-        best_max_val = 0
-        current_powerup = None
-        for key, template_img in self._templates.items():
-            template_img = cv2.resize(template_img, (int(template_img.shape[0]*scale), int(template_img.shape[1]*scale)))
-            res = cv2.matchTemplate(powerup_img, template_img, cv2.TM_CCOEFF)
-            _, max_val, _, _ = cv2.minMaxLoc(res)
-            if max_val > best_max_val:
-                best_max_val = max_val
-                current_powerup = key
+        current_powerup = self._matchTemplate(powerup_img, self._templates)
 
         if is_red_powerup:
             return (current_powerup, None, time, None)

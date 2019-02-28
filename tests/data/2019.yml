@@ -1,0 +1,69 @@
+01.png: |
+  Match Key: qf1m2
+  Match Name: Quarterfinal 5 of 8
+  Mode: teleop
+  Time remaining: 42
+  Red score: 59
+  Red cargo_ship_hatch_count: 1
+  Red cargo_ship_cargo_count: 4
+  Red rocket1_hatch_count: 5
+  Red rocket1_cargo_count: 3
+  Red rocket2_hatch_count: 4
+  Red rocket2_cargo_count: 2
+  Red rocket_rp: False
+  Red hab_rp: False
+  Blue score: 80
+  Blue cargo_ship_hatch_count: 2
+  Blue cargo_ship_cargo_count: 6
+  Blue rocket1_hatch_count: 6
+  Blue rocket1_cargo_count: 6
+  Blue rocket2_hatch_count: 5
+  Blue rocket2_cargo_count: 3
+  Blue rocket_rp: False
+  Blue hab_rp: False
+02.png: |
+  Match Key: qm31
+  Match Name: Qualification 31 of 49
+  Mode: teleop
+  Time remaining: 15
+  Red score: 101
+  Red cargo_ship_hatch_count: 2
+  Red cargo_ship_cargo_count: 8
+  Red rocket1_hatch_count: 6
+  Red rocket1_cargo_count: 6
+  Red rocket2_hatch_count: 5
+  Red rocket2_cargo_count: 3
+  Red rocket_rp: True
+  Red hab_rp: False
+  Blue score: 114
+  Blue cargo_ship_hatch_count: 8
+  Blue cargo_ship_cargo_count: 8
+  Blue rocket1_hatch_count: 6
+  Blue rocket1_cargo_count: 6
+  Blue rocket2_hatch_count: 4
+  Blue rocket2_cargo_count: 3
+  Blue rocket_rp: True
+  Blue hab_rp: True
+03.png: |
+  Match Key: qm31
+  Match Name: Qualification 31 of 49
+  Mode: pre_match
+  Time remaining: 0
+  Red score: 0
+  Red cargo_ship_hatch_count: 0
+  Red cargo_ship_cargo_count: 0
+  Red rocket1_hatch_count: 0
+  Red rocket1_cargo_count: 0
+  Red rocket2_hatch_count: 0
+  Red rocket2_cargo_count: 0
+  Red rocket_rp: False
+  Red hab_rp: False
+  Blue score: 0
+  Blue cargo_ship_hatch_count: 0
+  Blue cargo_ship_cargo_count: 0
+  Blue rocket1_hatch_count: 0
+  Blue rocket1_cargo_count: 0
+  Blue rocket2_hatch_count: 0
+  Blue rocket2_cargo_count: 0
+  Blue rocket_rp: False
+  Blue hab_rp: False

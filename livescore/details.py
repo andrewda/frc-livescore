@@ -77,6 +77,62 @@ class Alliance2018(Alliance):
             '{} face_the_boss: {}\n'.format(prefix, self.face_the_boss)
         )
 
+class Alliance2019(Alliance):
+    def __init__(
+            self,
+            score=None,
+            teams=[],
+            robot1_starting_level=None,
+            robot1_hab_line_cross=None,
+            robot1_ending_level=None,
+            robot2_starting_level=None,
+            robot2_hab_line_cross=None,
+            robot2_ending_level=None,
+            robot3_starting_level=None,
+            robot3_hab_line_cross=None,
+            robot3_ending_level=None,
+            cargo_ship_hatch_count=None,
+            cargo_ship_cargo_count=None,
+            rocket1_hatch_count=None,
+            rocket1_cargo_count=None,
+            rocket2_hatch_count=None,
+            rocket2_cargo_count=None,
+            rocket_rp=None,
+            hab_rp=None,
+        ):
+        super(Alliance2019, self).__init__(score=score, teams=teams)
+        self.robot1_starting_level = robot1_starting_level
+        self.robot1_starting_level = robot1_starting_level
+        self.robot1_hab_line_cross = robot1_hab_line_cross
+        self.robot1_ending_level = robot1_ending_level
+        self.robot2_starting_level = robot2_starting_level
+        self.robot2_hab_line_cross = robot2_hab_line_cross
+        self.robot2_ending_level = robot2_ending_level
+        self.robot3_starting_level = robot3_starting_level
+        self.robot3_hab_line_cross = robot3_hab_line_cross
+        self.robot3_ending_level = robot3_ending_level
+        self.cargo_ship_hatch_count = cargo_ship_hatch_count
+        self.cargo_ship_cargo_count = cargo_ship_cargo_count
+        self.rocket1_hatch_count = rocket1_hatch_count
+        self.rocket1_cargo_count = rocket1_cargo_count
+        self.rocket2_hatch_count = rocket2_hatch_count
+        self.rocket2_cargo_count = rocket2_cargo_count
+        self.rocket_rp = rocket_rp
+        self.hab_rp = hab_rp
+
+    def getString(self, prefix):
+        return (
+            '{} score: {}\n'.format(prefix, self.score) + \
+            '{} cargo_ship_hatch_count: {}\n'.format(prefix, self.cargo_ship_hatch_count) + \
+            '{} cargo_ship_cargo_count: {}\n'.format(prefix, self.cargo_ship_cargo_count) + \
+            '{} rocket1_hatch_count: {}\n'.format(prefix, self.rocket1_hatch_count) + \
+            '{} rocket1_cargo_count: {}\n'.format(prefix, self.rocket1_cargo_count) + \
+            '{} rocket2_hatch_count: {}\n'.format(prefix, self.rocket2_hatch_count) + \
+            '{} rocket2_cargo_count: {}\n'.format(prefix, self.rocket2_cargo_count) + \
+            '{} rocket_rp: {}\n'.format(prefix, self.rocket_rp) + \
+            '{} hab_rp: {}\n'.format(prefix, self.hab_rp)
+        )
+
 class OngoingMatchDetails(object):
     def __init__(self, match_key=None, match_name=None, mode=None, time=None, red=Alliance(), blue=Alliance()):
         self.match_key = match_key

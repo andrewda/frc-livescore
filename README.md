@@ -58,7 +58,7 @@ print(data)
 
 - `debug` - Debug mode, where outputs are displayed.
 - `save_training_data` - Whether the training should be saved to disk.
-- `training_data` - Path to save training data.
+- `append_training_data` - Whether to start training from scratch
 
 Creates and returns a new Livescore instance with specified options.
 

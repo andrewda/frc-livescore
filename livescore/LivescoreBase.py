@@ -1,6 +1,7 @@
 import colorsys
 import cv2
 import numpy as np
+import os
 import pickle
 import logging
 from PIL import Image
@@ -11,6 +12,7 @@ import regex
 from .simpleocr_utils.segmentation import segments_to_numpy
 from .simpleocr_utils.feature_extraction import SimpleFeatureExtractor
 
+TESSDATA_DIR = os.path.dirname(os.path.realpath(__file__)) + '/tessdata'
 
 class NoOverlayFoundException(Exception):
     pass
@@ -78,7 +80,7 @@ def fix_digits(text):
 
 
 class LivescoreBase(object):
-    def __init__(self, game_year, debug=False, save_training_data=False, training_data=None):
+    def __init__(self, game_year, debug=False, save_training_data=False, append_training_data=True):
         self._debug = debug
         self._save_training_data = save_training_data
         self._is_new_overlay = False
@@ -88,6 +90,8 @@ class LivescoreBase(object):
 
         self._BLACK_LOW = np.array([0, 0, 0])
         self._BLACK_HIGH = np.array([135, 135, 155])
+
+        self._morph_kernel = np.ones((3, 3), np.uint8)
 
         self._OCR_HEIGHT = 64  # Do all OCR at this size
 
@@ -121,14 +125,13 @@ class LivescoreBase(object):
         }
 
         # Train classifier
-        if training_data is None:
-            with open(pkg_resources.resource_filename(__name__, 'training_data') + '/digits.pkl', "rb") as f:
-                training_data = pickle.load(f, encoding='latin1')
-        else:
-            with open(training_data, "rb") as f:
-                training_data = pickle.load(f)
+        self._training_data_file = pkg_resources.resource_filename(__name__, 'training_data') + '/digits.pkl'
+        if append_training_data:
+            with open(self._training_data_file, "rb") as f:
+                self._training_data = pickle.load(f, encoding='latin1')
+
         self._knn = cv2.ml.KNearest_create()
-        self._knn.train(training_data['features'].astype(np.float32), cv2.ml.ROW_SAMPLE, training_data['classes'].astype(np.float32))
+        self._knn.train(self._training_data['features'].astype(np.float32), cv2.ml.ROW_SAMPLE, self._training_data['classes'].astype(np.float32))
 
     def _findScoreOverlay(self, img, force_find_overlay):
         # Does a quick check to see if overlay moved
@@ -203,9 +206,13 @@ class LivescoreBase(object):
 
         # Threshold
         if white:
-            return cv2.inRange(img, self._WHITE_LOW, self._WHITE_HIGH)
+            return cv2.morphologyEx(cv2.inRange(img, self._WHITE_LOW, self._WHITE_HIGH), cv2.MORPH_OPEN, self._morph_kernel)
         else:
-            return cv2.inRange(img, self._BLACK_LOW, self._BLACK_HIGH)
+            return cv2.morphologyEx(cv2.inRange(img, self._BLACK_LOW, self._BLACK_HIGH), cv2.MORPH_OPEN, self._morph_kernel)
+
+    def _parseRawMatchName(self, img):
+        config = '--oem 1 --psm 7 --tessdata-dir {} -l eng'.format(TESSDATA_DIR.replace('\\', '/'))
+        return pytesseract.image_to_string(255 - img, config=config).strip()
 
     def _parseDigits(self, img):
         # Crop height to digits
@@ -240,28 +247,33 @@ class LivescoreBase(object):
                     continue
 
                 dim = self._OCR_HEIGHT + 5
-                digit_img = np.zeros((dim, dim), np.uint8)
-                x2 = dim/2 - w/2
-                y2 = dim/2 - h/2
-                digit_img[y2:y2+h, x2:x2+w] = img[y:y+h, x:x+w]
+                digit_img = np.ones((dim, dim), np.uint8) * 255
+                x2 = int(dim/2 - w/2)
+                y2 = int(dim/2 - h/2)
+                digit_img[y2:y2+h, x2:x2+w] = 255 - img[y:y+h, x:x+w]
 
-                config = '--psm 8 -c tessedit_char_whitelist=1234567890'
+                config = '--oem 1 --psm 8 --tessdata-dir {} -l digits'.format(TESSDATA_DIR.replace('\\', '/'))
                 string = pytesseract.image_to_string(
                     Image.fromarray(digit_img),
                     config=config).strip()
                 if string and string.isdigit():
                     self._training_data['features'] = np.append(self._training_data['features'], features, axis=0)
                     self._training_data['classes'] = np.append(self._training_data['classes'], [[int(string)]], axis=0)
+
+                    # Update saved training data
+                    with open(self._training_data_file, "wb") as f:
+                        pickle.dump(self._training_data, f)
                 return None
             else:
                 # Perform classification
                 if w > self._OCR_HEIGHT:  # More than 1 digit, fall back to Tesseract
                     logging.warning("Falling back to Tesseract!")
-                    padded_img = cv2.copyMakeBorder(img[y:y+h, x:x+w], 5, 5, 5, 5, cv2.BORDER_CONSTANT, None, (0, 0, 0))
-                    config = '--psm 8 -c tessedit_char_whitelist=1234567890'
+                    padded_img = 255 - cv2.copyMakeBorder(img[y:y+h, x:x+w], 5, 5, 5, 5, cv2.BORDER_CONSTANT, None, (0, 0, 0))
+                    config = '--oem 1 --psm 8 --tessdata-dir {} -l digits'.format(TESSDATA_DIR.replace('\\', '/'))
                     string = pytesseract.image_to_string(
                         Image.fromarray(padded_img),
                         config=config).strip()
+
                     if string and string.isdigit():
                         digits.append((string, segments[0, 0]))
                     continue
@@ -310,6 +322,19 @@ class LivescoreBase(object):
         bgr = img[point[1], point[0], :]
         hsv = colorsys.rgb_to_hsv(float(bgr[2])/255, float(bgr[1])/255, float(bgr[0])/255)
         return hsv[1] > 0.2
+
+    def _matchTemplate(self, img, templates):
+        scale = self._transform['scale'] * self._TEMPLATE_SCALE
+        best_max_val = 0
+        matched_key = None
+        for key, template_img in templates.items():
+            template_img = cv2.resize(template_img, (int(np.round(template_img.shape[1]*scale)), int(np.round(template_img.shape[0]*scale))))
+            res = cv2.matchTemplate(img, template_img, cv2.TM_CCOEFF)
+            _, max_val, _, _ = cv2.minMaxLoc(res)
+            if max_val > best_max_val:
+                best_max_val = max_val
+                matched_key = key
+        return matched_key
 
     def _drawBox(self, img, box, color):
         cv2.polylines(img, [box], True, color, 2, cv2.LINE_AA)
