@@ -12,11 +12,10 @@ import regex
 from .simpleocr_utils.segmentation import segments_to_numpy
 from .simpleocr_utils.feature_extraction import SimpleFeatureExtractor
 
-TESSDATA_DIR = os.path.dirname(os.path.realpath(__file__)) + '/tessdata'
+TESSDATA_DIR = os.path.dirname(os.path.realpath(__file__)).replace('\\', '/') + '/tessdata'
 
-class NoOverlayFoundException(Exception):
-    pass
-
+# Only include --tessdata-dir on non-Windows devices. Can cause a Tesseract crash on Windows.
+TESSDATA_CONFIG = '--tessdata-dir {}'.format(TESSDATA_DIR) if os.name != 'nt' else ''
 
 QF_BRACKET_ELIM_MAPPING = {
     1: (1, 1),  # (set, match)
@@ -77,6 +76,10 @@ MATCH_ID_FORMATS = [
 
 def fix_digits(text):
     return int(text.replace('Z', '2').replace('S', '5').replace('O', '0'))
+
+
+class NoOverlayFoundException(Exception):
+    pass
 
 
 class LivescoreBase(object):
@@ -211,7 +214,7 @@ class LivescoreBase(object):
             return cv2.morphologyEx(cv2.inRange(img, self._BLACK_LOW, self._BLACK_HIGH), cv2.MORPH_OPEN, self._morph_kernel)
 
     def _parseRawMatchName(self, img):
-        config = '--oem 1 --psm 7 --tessdata-dir {} -l eng'.format(TESSDATA_DIR.replace('\\', '/'))
+        config = '--oem 1 --psm 7 {} -l eng'.format(TESSDATA_CONFIG)
         return pytesseract.image_to_string(255 - img, config=config).strip()
 
     def _parseDigits(self, img):
@@ -252,7 +255,7 @@ class LivescoreBase(object):
                 y2 = int(dim/2 - h/2)
                 digit_img[y2:y2+h, x2:x2+w] = 255 - img[y:y+h, x:x+w]
 
-                config = '--oem 1 --psm 8 --tessdata-dir {} -l digits'.format(TESSDATA_DIR.replace('\\', '/'))
+                config = '--oem 1 --psm 8 {} -l digits'.format(TESSDATA_CONFIG)
                 string = pytesseract.image_to_string(
                     Image.fromarray(digit_img),
                     config=config).strip()
@@ -269,7 +272,7 @@ class LivescoreBase(object):
                 if w > self._OCR_HEIGHT:  # More than 1 digit, fall back to Tesseract
                     logging.warning("Falling back to Tesseract!")
                     padded_img = 255 - cv2.copyMakeBorder(img[y:y+h, x:x+w], 5, 5, 5, 5, cv2.BORDER_CONSTANT, None, (0, 0, 0))
-                    config = '--oem 1 --psm 8 --tessdata-dir {} -l digits'.format(TESSDATA_DIR.replace('\\', '/'))
+                    config = '--oem 1 --psm 8 {} -l digits'.format(TESSDATA_CONFIG)
                     string = pytesseract.image_to_string(
                         Image.fromarray(padded_img),
                         config=config).strip()
