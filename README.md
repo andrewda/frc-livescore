@@ -2,6 +2,11 @@
 
 A package which can determine the score of a live FRC game from an image.
 
+![Travis](https://img.shields.io/travis/andrewda/frc-livescore.svg?style=flat-square)
+[![License](https://img.shields.io/github/license/andrewda/frc-livescore.svg?style=flat-square)](https://github.com/andrewda/frc-livescore/blob/master/LICENSE)
+![Version](https://img.shields.io/pypi/v/livescore.svg?style=flat-square)
+![Downloads](https://img.shields.io/pypi/dm/livescore.svg?style=flat-square)
+
 ## Features
 
 - Access to many parts of the scoreboard (and more coming soon)
@@ -48,13 +53,13 @@ print(data)
 
 ## API
 
-## Constructor
+### Constructor
 
 #### LivescoreYEAR(debug=False, save_training_data=False, training_data=None)
 
-> Currently supported years: 2017, 2018
+> Currently supported years: 2017, 2018, 2019
 >
-> e.g. Livescore2017() or Livescore2018()
+> e.g. Livescore2017(), Livescore2018() or Livescore2019()
 
 - `debug` - Debug mode, where outputs are displayed.
 - `save_training_data` - Whether the training should be saved to disk.
@@ -77,6 +82,10 @@ image will be `False`.
 ### Classes
 
 #### AllianceYEAR
+
+> Currently supported years: 2017, 2018, 2019
+>
+> e.g. Alliance2017, Alliance2018 or Alliance2019
 
 - `score` - The alliance's score.
 - ... many more year-specific properties.
