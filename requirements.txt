@@ -3,4 +3,4 @@ numpy==1.14.0
 regex==2018.02.08
 pyyaml==3.12
 opencv-python==3.4.2.17
-opencv-contrib-python==3.4.2.17
+opencv-contrib-python==4.2.0.32
