@@ -3,6 +3,11 @@ class Alliance(object):
         self.teams = teams
         self.score = score
 
+    def getString(self, prefix):
+        return (
+            '{} score: {}\n'.format(prefix, self.score)
+        )
+
 
 class Alliance2017(Alliance):
     def __init__(

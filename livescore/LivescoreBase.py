@@ -35,8 +35,9 @@ SF_BRACKET_ELIM_MAPPING = {
     4: (2, 2),
 }
 
-
 NUMBER_PATTERN = '0-9ZSO'  # Characters that might get recognized as numbers
+
+
 def num_pat(r):
     return r.replace('@', NUMBER_PATTERN)
 
@@ -104,20 +105,23 @@ class LivescoreBase(object):
         self._detector = cv2.xfeatures2d.SURF_create()
 
         FLANN_INDEX_KDTREE = 0
-        index_params = dict(algorithm = FLANN_INDEX_KDTREE, trees = 5)
-        search_params = dict(checks = 50)
+        index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
+        search_params = dict(checks=50)
         self._flann = cv2.FlannBasedMatcher(index_params, search_params)
 
         self._MIN_MATCH_COUNT = 9
 
-        # Compute score overlay keypoints and descriptors
+        # Compute score overlay keypoints and descriptors (Source Image should be 1280x170)
+        self._TEMPLATE_SHAPE = (1280, 170)
         self._TEMPLATE_SCALE = 0.5  # lower is faster
         template = cv2.imread(
             pkg_resources.resource_filename(__name__, 'templates') + \
             '/score_overlay_{}.png'.format(game_year))
+        tpl_width=np.int32(np.round(template.shape[1] * self._TEMPLATE_SCALE))
+        tpl_height=np.int32(np.round(template.shape[0] * self._TEMPLATE_SCALE))
         self._template = cv2.resize(template, (
-            np.int32(np.round(template.shape[1] * self._TEMPLATE_SCALE)),
-            np.int32(np.round(template.shape[0] * self._TEMPLATE_SCALE))
+            tpl_width,
+            tpl_height
         ))
         self._kp1, self._des1 = self._detector.detectAndCompute(self._template, None)
 
@@ -134,7 +138,8 @@ class LivescoreBase(object):
                 self._training_data = pickle.load(f, encoding='latin1')
 
         self._knn = cv2.ml.KNearest_create()
-        self._knn.train(self._training_data['features'].astype(np.float32), cv2.ml.ROW_SAMPLE, self._training_data['classes'].astype(np.float32))
+        self._knn.train(self._training_data['features'].astype(np.float32), cv2.ml.ROW_SAMPLE,
+                        self._training_data['classes'].astype(np.float32))
 
     def _findScoreOverlay(self, img, force_find_overlay):
         # Does a quick check to see if overlay moved
@@ -146,9 +151,9 @@ class LivescoreBase(object):
             x = self._transform['tx']
             scale = self._transform['scale']
             overlay = img[
-                max(0, int(y)):min(int(y+self._template.shape[0]*scale), img.shape[0] - 1),
-                max(0, int(x)):min(int(x+self._template.shape[1]*scale), img.shape[1] - 1),
-            ]
+                      max(0, int(y)):min(int(y + self._template.shape[0] * scale), img.shape[0] - 1),
+                      max(0, int(x)):min(int(x + self._template.shape[1] * scale), img.shape[1] - 1),
+                      ]
             if overlay.shape[0] != 0 and overlay.shape[1] != 0:
                 template_img = cv2.resize(self._template, (int(overlay.shape[1]), int(overlay.shape[0])))
                 res = cv2.matchTemplate(overlay, template_img, cv2.TM_CCOEFF)
@@ -167,15 +172,15 @@ class LivescoreBase(object):
                 good.append(m)
 
         if len(good) >= self._MIN_MATCH_COUNT:
-            src_pts = np.float32([ self._kp1[m.queryIdx].pt for m in good ]).reshape(-1, 1, 2)
-            dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good ]).reshape(-1, 1, 2)
+            src_pts = np.float32([self._kp1[m.queryIdx].pt for m in good]).reshape(-1, 1, 2)
+            dst_pts = np.float32([kp2[m.trainIdx].pt for m in good]).reshape(-1, 1, 2)
 
-            t = cv2.estimateRigidTransform(src_pts, dst_pts, False)
+            t = cv2.estimateAffinePartial2D(src_pts, dst_pts)
             if t is not None:
                 self._transform = {
-                    'scale': t[0, 0],
-                    'tx': t[0, 2],
-                    'ty': t[1, 2],
+                    'scale': t[0][0, 0],
+                    'tx': t[0][0, 2],
+                    'ty': t[0][1, 2],
                 }
                 self._is_new_overlay = True
                 return
@@ -209,9 +214,11 @@ class LivescoreBase(object):
 
         # Threshold
         if white:
-            return cv2.morphologyEx(cv2.inRange(img, self._WHITE_LOW, self._WHITE_HIGH), cv2.MORPH_OPEN, self._morph_kernel)
+            return cv2.morphologyEx(cv2.inRange(img, self._WHITE_LOW, self._WHITE_HIGH), cv2.MORPH_OPEN,
+                                    self._morph_kernel)
         else:
-            return cv2.morphologyEx(cv2.inRange(img, self._BLACK_LOW, self._BLACK_HIGH), cv2.MORPH_OPEN, self._morph_kernel)
+            return cv2.morphologyEx(cv2.inRange(img, self._BLACK_LOW, self._BLACK_HIGH), cv2.MORPH_OPEN,
+                                    self._morph_kernel)
 
     def _parseRawMatchName(self, img):
         config = '--oem 1 --psm 7 {} -l eng'.format(TESSDATA_CONFIG)
@@ -242,7 +249,7 @@ class LivescoreBase(object):
             segments = segments_to_numpy([cv2.boundingRect(cnt)])
             extractor = SimpleFeatureExtractor(feature_size=10, stretch=False)
             features = extractor.extract(img, segments)
-            x,y,w,h = cv2.boundingRect(cnt)
+            x, y, w, h = cv2.boundingRect(cnt)
 
             if self._save_training_data:
                 # Construct clean digit image
@@ -251,9 +258,9 @@ class LivescoreBase(object):
 
                 dim = self._OCR_HEIGHT + 5
                 digit_img = np.ones((dim, dim), np.uint8) * 255
-                x2 = int(dim/2 - w/2)
-                y2 = int(dim/2 - h/2)
-                digit_img[y2:y2+h, x2:x2+w] = 255 - img[y:y+h, x:x+w]
+                x2 = int(dim / 2 - w / 2)
+                y2 = int(dim / 2 - h / 2)
+                digit_img[y2:y2 + h, x2:x2 + w] = 255 - img[y:y + h, x:x + w]
 
                 config = '--oem 1 --psm 8 {} -l digits'.format(TESSDATA_CONFIG)
                 string = pytesseract.image_to_string(
@@ -271,7 +278,8 @@ class LivescoreBase(object):
                 # Perform classification
                 if w > self._OCR_HEIGHT:  # More than 1 digit, fall back to Tesseract
                     logging.warning("Falling back to Tesseract!")
-                    padded_img = 255 - cv2.copyMakeBorder(img[y:y+h, x:x+w], 5, 5, 5, 5, cv2.BORDER_CONSTANT, None, (0, 0, 0))
+                    padded_img = 255 - cv2.copyMakeBorder(img[y:y + h, x:x + w], 5, 5, 5, 5, cv2.BORDER_CONSTANT, None,
+                                                          (0, 0, 0))
                     config = '--oem 1 --psm 8 {} -l digits'.format(TESSDATA_CONFIG)
                     string = pytesseract.image_to_string(
                         Image.fromarray(padded_img),
@@ -316,14 +324,14 @@ class LivescoreBase(object):
                 elif comp_level == 'f':
                     return 'f1m{}'.format(fix_digits(match.group(2)))
                 elif comp_level == 'overtimef':
-                    return 'f1m{}'.format(3+fix_digits(match.group(2)))
+                    return 'f1m{}'.format(3 + fix_digits(match.group(2)))
                 else:
                     return 'test'
         return None
 
     def _checkSaturated(self, img, point):
         bgr = img[point[1], point[0], :]
-        hsv = colorsys.rgb_to_hsv(float(bgr[2])/255, float(bgr[1])/255, float(bgr[0])/255)
+        hsv = colorsys.rgb_to_hsv(float(bgr[2]) / 255, float(bgr[1]) / 255, float(bgr[0]) / 255)
         return hsv[1] > 0.2
 
     def _matchTemplate(self, img, templates):
@@ -331,7 +339,8 @@ class LivescoreBase(object):
         best_max_val = 0
         matched_key = None
         for key, template_img in templates.items():
-            template_img = cv2.resize(template_img, (int(np.round(template_img.shape[1]*scale)), int(np.round(template_img.shape[0]*scale))))
+            template_img = cv2.resize(template_img, (
+            int(np.round(template_img.shape[1] * scale)), int(np.round(template_img.shape[0] * scale))))
             res = cv2.matchTemplate(img, template_img, cv2.TM_CCOEFF)
             _, max_val, _, _ = cv2.minMaxLoc(res)
             if max_val > best_max_val:
